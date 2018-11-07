@@ -17,7 +17,7 @@ public:
 
 private:
     int shapeID;
-    int shape[4][4];
+    int shape[2][4];
 
 
 };
