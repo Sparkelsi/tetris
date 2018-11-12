@@ -35,3 +35,36 @@ void Grid::insertShape(Shapes x) //will always be inserted at same insertion poi
             }
         }
 }
+
+void Grid::createList()
+{
+
+    for(int i = 0; i < 5; i++)
+    {
+        shapelist.push_back(getRandomShape());
+    }
+}
+
+Shapes Grid::getRandomShape()
+{
+    int _rando;
+    srand(time(NULL));
+    _rando = rand() % 7 + 1;    //between 1 and 7
+
+    Shapes temp = _rando;
+    return temp;
+}
+
+void Grid::pullShape()
+{
+    Shapes tmp = shapelist.front().getShapeID();
+
+    insertShape(tmp);
+    printGrid();
+    //if(shapelist.front() == tmp)
+    //shapelist.remove(tmp);
+    shapelist.push_back(getRandomShape());
+
+
+    //check if empty
+}

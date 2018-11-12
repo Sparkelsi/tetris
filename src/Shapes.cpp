@@ -18,7 +18,8 @@ Shapes::Shapes(int shapeID)
     }
 
 int Shapes::getShapeID() {
-    return shapeID;
+    return rand() % 7;
+    //return shapeID;
 }
 
 int Shapes::getShape(int x, int y) { //this needs to change with size of grid
