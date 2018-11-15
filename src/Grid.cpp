@@ -17,11 +17,11 @@ Grid::Grid()
 
 void Grid::printGrid()
 {
-    for(int i = 0; i < FIELDSIZE; i++) {
-        for(int j = 0; j < FIELDSIZE; j++) {
+    for(int i = 1; i < FIELDSIZE - 1; i++) {
+        for(int j = 1; j < FIELDSIZE - 1; j++) {
             if(gridMap[i][j] == 0){ //nullptr
-                printw("%d", 0);
-            } else {
+            //     printw("%d", 0);
+            // } else {
                 printw("%d", gridMap[i][j]);// = nullptr;
             }
         }
@@ -35,9 +35,9 @@ void Grid::insertShape(Shapes z) //will always be inserted at same insertion poi
     int y;                                   //i and j are at insertion point
         for(int i = 1; i < 3; i++) {        //when you make the final grid, be sure to add the numbers in the middle of the grid in the right spots
             for(int j = 10; j < 14; j++) {
-                x = i - 1;// - 9;
-                y = j - 10;// - 1;
-                gridMap[i][j] = z.getShape(y, x);
+                x = i - 1;
+                y = j - 10;
+                gridMap[j][i] = z.getShape(y, x);
             }
         }
 }
@@ -64,11 +64,13 @@ Shapes Grid::getRandomShape()
     return tmp;
 }
 
-void Grid::pullShape()
+void Grid::pullShape(WINDOW *score)     // make sure to take score out, just testing things
 {
     if(shapelist.empty()) {
         createList();
     }
+
+    shapelist.front().printShape(score, 2, 2);
 
     insertShape(shapelist.front());
     //if(!shapelist.empty())
@@ -87,7 +89,7 @@ void Grid::pullShape()
 
 int Grid::getCoord(int y, int x)
 {
-    return gridMap[x][y];
+    return gridMap[y][x];
 }
 
 void Grid::printList(WINDOW* nextShapes)

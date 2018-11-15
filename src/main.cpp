@@ -78,18 +78,30 @@ int main(int argc, char *argv[]) {
 
 
         printField(field, nextShapes, score, fieldGrid);
+
+        wclear(nextShapes);
+        wclear(score);
+        draw_borders(nextShapes);
+        draw_borders(score);
+        mvwprintw(nextShapes, 1, 1, "Next Shape: ");
+        mvwprintw(score, 1, 1, "Score: ");
+
         //must be in separate function to cycle through shape list
-        fieldGrid.pullShape();
+        fieldGrid.pullShape(score);
         fieldGrid.printList(nextShapes);
+
+        wrefresh(score);
         wrefresh(nextShapes);
         wclear(field);
         wclear(nextShapes);
+        wclear(score);
         draw_borders(nextShapes);
         draw_borders(field);
+        printField(field, nextShapes, score, fieldGrid);
     // grid.pullShape();
     // wrefresh(nextShapes);
         sleep(2);
-        printField(field, nextShapes, score, fieldGrid);
+
 
 
 
@@ -222,40 +234,19 @@ void draw_borders(WINDOW *screen) {
 
 void printField(WINDOW *field, WINDOW *nextShapes, WINDOW *score, Grid grid) {
     int x, y;
+
     for(int i = 1; i < FIELDSIZE - 1; i++) {                                  // successfully prints starting grid (as of now 11/14)
         for(int j = 1; j < FIELDSIZE - 1; j++) {
             x = i;
             y = j;
             //wclear(field);
             draw_borders(field);
-            draw_borders(nextShapes);
-            draw_borders(score);
             mvwprintw(field, y, x, "%d", grid.getCoord(i, j)); //can potentially be made as draw border grid function
-            mvwprintw(nextShapes, 1, 1, "Next Shape: ");
-           // grid.pullShape();
-            mvwprintw(score, 1, 1, "Score: ");
             wrefresh(field);                                                // steps in order
-            wrefresh(nextShapes);                                           // print start
-            wrefresh(score);                                                // load in first shape
-        }                                                                   // shift next shapes
-    }                                                                       // let shape fall on it's own
-                                                                            // pull another shape when shape hit's bottom
-  //  wclear(nextShapes);
-   // draw_borders(nextShapes);
-    //mvwprintw(score, 1, 1, "Score: ");
-    //wclear(nextShapes);
-    //draw_borders(nextShapes);
-    //mvwprintw(nextShapes, 1, 1, "Next Shape: ");
-    // grid.pullShape();
-    // grid.printList(nextShapes);
-    // wrefresh(nextShapes);
-    // wclear(field);
-    // wclear(nextShapes);
-    // draw_borders(nextShapes);
-    // draw_borders(field);
-    // // grid.pullShape();
-    // // wrefresh(nextShapes);
-    // sleep(2);
+
+        }                                            // load in first shape
+    }                                                                    // shift next shapes
+    wclear(field);
 }
 
 //how to get an object to move on its own

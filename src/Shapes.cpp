@@ -36,7 +36,7 @@ int Shapes::getShape(int x, int y) { //this needs to change with size of grid
     // }
     //std::cout << "you did something wrong\n";
     if(y < SHAPEI && x < SHAPEJ)
-        return shape[x][y];
+        return shape[y][x];
     else
         throw std::out_of_range("wrong");
 }
