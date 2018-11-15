@@ -1,7 +1,10 @@
 #ifndef SHAPES_HPP
 #define SHAPES_HPP
 
+#include <ncurses.h>
 
+#define SHAPEI  2
+#define SHAPEJ  4
 
 class Shapes {
 public:
@@ -13,13 +16,13 @@ public:
     int getShape(int x, int y);
     //int getShapej(int x, int y);
     void makeShape(int shapeID);
-    void printShape();
+    void printShape(WINDOW *nextShapes, int y, int x);
     //int getShapeID() { return shapeID; }
 
 
 private:
     int shapeID;
-    int shape[2][4];
+    int shape[SHAPEI][SHAPEJ];
 
 
 };

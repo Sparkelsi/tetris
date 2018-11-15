@@ -1,11 +1,14 @@
 #include "Shapes.hpp"
 #include <iostream>
 
+// #define SHAPEI = 2;
+// #define SHAPEJ = 4;
+
 Shapes::Shapes()
     :shapeID(0)
     {
-        for(int i = 0; i < 2; i++) {
-            for(int j = 0; j < 4; j++) {
+        for(int i = 0; i < SHAPEI; i++) {
+            for(int j = 0; j < SHAPEJ; j++) {
                 shape[i][j] = 0;
             }
         }
@@ -18,39 +21,25 @@ Shapes::Shapes(int shapeID)
     }
 
 int Shapes::getShapeID() {
-    return rand() % 7;
-    //return shapeID;
+    return shapeID;
 }
 
 int Shapes::getShape(int x, int y) { //this needs to change with size of grid
-    for(int i = 0; i < 2; i++) {
-        for(int j = 0; j < 4; j++) {
-            if(i == x) {
-                if(j == y) {
-                    return shape[x][y];
-                }
-            }
-        }
-    }
+    // for(int i = 0; i < SHAPEI; i++) {
+    //     for(int j = 0; j < SHAPEJ; j++) {
+    //         if(i == y) {
+    //             if(j == x) {
+    //                 return shape[x][y];
+    //             }
+    //         }
+    //     }
+    // }
     //std::cout << "you did something wrong\n";
-    return 0;
+    if(y < SHAPEI && x < SHAPEJ)
+        return shape[x][y];
+    else
+        throw std::out_of_range("wrong");
 }
-
-// int Shapes::getShapej(int x, int y) {
-//     for(int i = 0; i < 4; i++) {
-//         for(int j = 0; j < 4; j++) {
-//             if(i == x) {
-//                 if(j == y) {
-//                     return y;
-//                 }
-//             }
-//         }
-//     }
-//     std::cout << "you did something wrong\n";
-//     return 0;
-// }
-
-
 
 /*  1 = cube
 *   2 = line
@@ -63,14 +52,10 @@ int Shapes::getShape(int x, int y) { //this needs to change with size of grid
 void Shapes::makeShape(int shapeID) {
     switch(shapeID) {
         case 1:
-            for(int i = 0; i < 2; i++) {
-                for(int j = 0; j < 4; j++) {
-                    if(i == 0 || i == 1){
-                        if(j == 0 || j == 1){
-                            shape[i][j] = 1;
-                        } else {
-                            shape[i][j] = 0;
-                        }
+            for(int i = 0; i < SHAPEI; i++) {
+                for(int j = 0; j < SHAPEJ; j++) {
+                    if(j == 1 || j == 2){
+                        shape[i][j] = 1;
                     } else {
                         shape[i][j] = 0;
                     }
@@ -78,8 +63,8 @@ void Shapes::makeShape(int shapeID) {
             }
             break;
         case 2:
-            for(int i = 0; i < 2; i++) {
-                for(int j = 0; j < 4; j++) {
+            for(int i = 0; i < SHAPEI; i++) {
+                for(int j = 0; j < SHAPEJ; j++) {
                     if(i == 1){
                         shape[i][j] = 1;
                     } else {
@@ -89,9 +74,9 @@ void Shapes::makeShape(int shapeID) {
             }
             break;
         case 3:
-            for(int i = 0; i < 2; i++) {
-                for(int j = 0; j < 4; j++) {
-                    if(i == 0 && j == 1){
+            for(int i = 0; i < SHAPEI; i++) {
+                for(int j = 0; j < SHAPEJ; j++) {
+                    if(j == 1) {
                         shape[i][j] = 1;
                     } else if(i == 1 && j != 3){
                         shape[i][j] = 1;
@@ -102,11 +87,13 @@ void Shapes::makeShape(int shapeID) {
             }
             break;
         case 4:
-            for(int i = 0; i < 2; i++) {
-                for(int j = 0; j < 4; j++) {
-                    if(i == 0 && (j == 1 || j == 2)){
+            for(int i = 0; i < SHAPEI; i++) {
+                for(int j = 0; j < SHAPEJ; j++) {
+                    if(j == 1) {
                         shape[i][j] = 1;
-                    } else if(i == 1 && (j == 0 || j == 1)){
+                    } else if(i == 1 && j ==0) {
+                        shape[i][j] = 1;
+                    } else if(i == 0 && j == 2) {
                         shape[i][j] = 1;
                     } else {
                         shape[i][j] = 0;
@@ -115,11 +102,13 @@ void Shapes::makeShape(int shapeID) {
             }
             break;
         case 5:
-            for(int i = 0; i < 2; i++) {
-                for(int j = 0; j < 4; j++) {
-                    if(i == 0 && (j == 0 || j == 1)){
+            for(int i = 0; i < SHAPEI; i++) {
+                for(int j = 0; j < SHAPEJ; j++) {
+                    if(j == 1) {
                         shape[i][j] = 1;
-                    } else if(i == 1 && (j == 1 || j == 2)){
+                    } else if(i == 0 && j == 0) {
+                        shape[i][j] = 1;
+                    } else if(i == 1 && j == 2) {
                         shape[i][j] = 1;
                     } else {
                         shape[i][j] = 0;
@@ -128,8 +117,8 @@ void Shapes::makeShape(int shapeID) {
             }
             break;
         case 6:
-            for(int i = 0; i < 2; i++) {
-                for(int j = 0; j < 4; j++) {
+            for(int i = 0; i < SHAPEI; i++) {
+                for(int j = 0; j < SHAPEJ; j++) {
                     if(j == 0){
                         shape[i][j] = 1;
                     } else if(i == 1 && j != 3){
@@ -141,8 +130,8 @@ void Shapes::makeShape(int shapeID) {
             }
             break;
         case 7:
-            for(int i = 0; i < 2; i++) {
-                for(int j = 0; j < 4; j++) {
+            for(int i = 0; i < SHAPEI; i++) {
+                for(int j = 0; j < SHAPEJ; j++) {
                     if(j == 2){
                         shape[i][j] = 1;
                     } else if(i == 1 && j != 3){
@@ -159,16 +148,17 @@ void Shapes::makeShape(int shapeID) {
 }
 
 
-void Shapes::printShape() {
-    for(int i = 0; i < 2; i++) {
-        for(int j = 0; j < 4; j++) {
-            std::cout << shape[i][j];
+void Shapes::printShape(WINDOW* nextShapes, int y, int x) {
+    for(int i = 0; i < SHAPEI; i++) {
+        for(int j = 0; j < SHAPEJ; j++) {
+            mvwprintw(nextShapes, y, x, "%d", shape[i][j]);
+            //wrefresh(nextShapes);
+            x++;
         }
-        std::cout << "\n";
+        x -= 4;
+        y++;
+        //mvwprintw(nextShapes, y, x, "\n");
+      //  std::cout << "\n";
     }
+    //mvwprintw(nextShapes, y, x, "\n\n");
 }
-
-// int getShapeID()
-// {
-//     return shapeID;
-// }

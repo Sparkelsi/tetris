@@ -1,7 +1,10 @@
 #ifndef GRID_HPP
 #define GRID_HPP
 #include "Shapes.hpp"
+#include <ncurses.h>
 #include <list>
+
+#define FIELDSIZE 24
 
 class Grid {
 public:
@@ -13,9 +16,14 @@ public:
     void createList();
     Shapes getRandomShape();
     void pullShape();
+    // void addShape();
+    int getCoord(int y, int x);
+    void printList(WINDOW* nextShapes); //for testing purposes only
+    void resetGrid(); //testing purposes
 
 private:
-    int gridMap[12][12]; //original is 10/24
+    int gridMap[FIELDSIZE][FIELDSIZE]; //original is 10/24
+    //int score;
     std::list<Shapes> shapelist;
 };
 
