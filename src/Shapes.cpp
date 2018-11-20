@@ -48,6 +48,7 @@ void Shapes::makeShape(int shapeID) {
                     }
                 }
             }
+            refresh();
             break;
         case 2:
             for(int i = 0; i < 2; i++) {
@@ -59,6 +60,7 @@ void Shapes::makeShape(int shapeID) {
                     }
                 }
             }
+            refresh();
             break;
         case 3:
             for(int i = 0; i < 2; i++) {
@@ -72,6 +74,7 @@ void Shapes::makeShape(int shapeID) {
                     }
                 }
             }
+            refresh();
             break;
         case 4:
             for(int i = 0; i < 2; i++) {
@@ -87,6 +90,7 @@ void Shapes::makeShape(int shapeID) {
                     }
                 }
             }
+            refresh();
             break;
         case 5:
             for(int i = 0; i < 2; i++) {
@@ -102,6 +106,7 @@ void Shapes::makeShape(int shapeID) {
                     }
                 }
             }
+            refresh();
             break;
         case 6:
             for(int i = 0; i < 2; i++) {
@@ -115,6 +120,7 @@ void Shapes::makeShape(int shapeID) {
                     }
                 }
             }
+            refresh();
             break;
         case 7:
             for(int i = 0; i < 2; i++) {
@@ -128,6 +134,7 @@ void Shapes::makeShape(int shapeID) {
                     }
                 }
             }
+            refresh();
             break;
         default:
             break;

@@ -4,6 +4,8 @@
 #include <iostream>
 #include <random>
 
+
+
 Grid::Grid()
     {
         for(int i = 0; i < FIELDSIZEY; i++) {
@@ -15,13 +17,16 @@ Grid::Grid()
 
 void Grid::printGrid()                                  // prints entire grid's data
 {
+
     for(int i = 1; i < FIELDSIZEY - 1; i++) {
         for(int j = 1; j < FIELDSIZEX - 1; j++) {
             if(gridMap[i][j] == 0) {
+        
                 printw("%d", gridMap[i][j]);
             }
         }
     }
+
 }
 
 void Grid::createList()
@@ -54,6 +59,7 @@ void Grid::insertShape(Shapes z, WINDOW *field, WINDOW *nextShapes, WINDOW *scor
                 if(gridMap[j][i] == 1) {
                     gameOverDisp(field, nextShapes, score);     //displays game over window if top pieces hit top of grid
                 } else {
+
                     gridMap[j][i] = z.getShape(y, x);           // copies the shape into the grid
                 }
             }
@@ -90,6 +96,7 @@ void Grid::resetGrid()                                  // testing purposes only
 
 void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
 {
+
    int z = 0;                                           // i and j are at insertion point
     for(int i = 1; i < 3; i++) {                        // using specific i and j for more efficiency (this is where the shape is inserted)
         for(int j = 6; j < 10; j++) {
@@ -298,6 +305,7 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
             yThree++;
             yFour++;
 
+            attron(COLOR_PAIR(2));
             gridMap[xOne][yOne] = 1;                    // puts 1's where shape is after moving down
             gridMap[xTwo][yTwo] = 1;
             gridMap[xThree][yThree] = 1;
@@ -314,6 +322,7 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
             sleep(1);
 
         }
+
     }
 
     // gridMap[xOne][yOne] = 1;                         // reassigns 1's to where the shape was if it can't move
@@ -326,6 +335,7 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
     printField(field);                                  // reprints everything out once the shape can no longer move down
     printNextShapes(nextShapes);
     printScore(score);
+
 }
 
 
@@ -659,7 +669,7 @@ void Grid::moveAllDown()
 
             gridMap[xOne][yOne] = 0;                    // makes current space of shape all 0's
             gridMap[xTwo][yTwo] = 0;
-            gridMap[xThree][yThree] = 0;
+            gridMap[xThree][yThree] = 0;              //set = to ' ' appears to stop the
             gridMap[xFour][yFour] = 0;
 
             yOne++;                                     // increments current space of shape to appear to move all the way down
@@ -845,11 +855,12 @@ void Grid::draw_borders(WINDOW *screen) {               // draws borders for eac
     int x, y, i;
 
   getmaxyx(screen, y, x);
-
+  wattron(screen, COLOR_PAIR(2));                       //starts the borders printing yellow
   mvwprintw(screen, 0, 0, "+");                         // makes the 4 corners of the map
   mvwprintw(screen, y - 1, 0, "+");
   mvwprintw(screen, 0, x - 1, "+");
   mvwprintw(screen, y - 1, x - 1, "+");
+
 
   for (i = 1; i < (y - 1); i++) {                       // makes the sides of the map
     mvwprintw(screen, i, 0, "|");
@@ -860,24 +871,38 @@ void Grid::draw_borders(WINDOW *screen) {               // draws borders for eac
     mvwprintw(screen, 0, i, "-");
     mvwprintw(screen, y - 1, i, "-");
   }
+  wattroff(screen, COLOR_PAIR(2));                      //ends the borders printing yellow
+
 }
 
 void Grid::printField(WINDOW *field)                    // prints full field window
 {
+
+
     for(int i = 1; i < FIELDSIZEY - 1; i++) {
         for(int j = 1; j < FIELDSIZEX - 1; j++) {
             draw_borders(field);
+
+            wattron(field, COLOR_PAIR(1));              //makes the 0s and 1s cyan
             mvwprintw(field, j, i, "%d", getCoord(i, j)); // prints data of grid in the field window
-            wrefresh(field);
+
         }
+
+
     }
+    touchwin(field);                                //this is just to makes sure that changes are made to the field window.
+    wrefresh(field);
+
     wclear(field);
+
 }
 
 void Grid::printNextShapes(WINDOW *nextShapes)          // prints full nextShapes window
 {
     wclear(nextShapes);
+
     draw_borders(nextShapes);
+
     mvwprintw(nextShapes, 1, 1, "Next Shape: ");
     int y = 3;                                          // coordinates for where shape is printed
     int x = 10;                                         // coordinates for where shape is printed
@@ -889,13 +914,14 @@ void Grid::printNextShapes(WINDOW *nextShapes)          // prints full nextShape
         y += 3;                                         // so that there's spaces between the shapes
         i++;
     }
-
+    touchwin(nextShapes);
     wrefresh(nextShapes);
 
 }
 
 void Grid::printScore(WINDOW *score)                    // prints full score window
 {
+
     wclear(score);
     draw_borders(score);
     mvwprintw(score, 1, 1, "Score: ");
@@ -927,4 +953,4 @@ void Grid::fillRow()                                    // for testing purposes
         gridMap[j][8] = 1;
         gridMap[j][4] = 1;
     }
-} 
+}

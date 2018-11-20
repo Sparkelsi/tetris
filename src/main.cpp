@@ -27,8 +27,18 @@ int main(int argc, char *argv[]) {
     int coord;
 
     initscr();
+    start_color();
+    init_pair(1, COLOR_CYAN, COLOR_BLACK);
+    init_pair(2, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(3, COLOR_RED, COLOR_BLACK);
+    init_pair(4, COLOR_GREEN, COLOR_BLACK);
+    init_pair(5, COLOR_WHITE, COLOR_BLACK);
+    init_pair(6, COLOR_BLACK, COLOR_BLACK);
+
     noecho();
     curs_set(FALSE);
+
+
 
     Grid fieldGrid = Grid();                            // creates grid
 
@@ -43,10 +53,11 @@ int main(int argc, char *argv[]) {
     WINDOW *nextShapes = newwin(19, 24, 0, 24);
     WINDOW *score = newwin(5, 24, 19, 24);
 
-
+   // wattron(field, COLOR_PAIR(1));
     fieldGrid.draw_borders(field);
     fieldGrid.draw_borders(nextShapes);
     fieldGrid.draw_borders(score);
+
 
     while(1) {
         getmaxyx(stdscr, new_y, new_x);
@@ -74,8 +85,13 @@ int main(int argc, char *argv[]) {
 
 
         fieldGrid.printField(field);
+
+        //wattron(nextShapes, COLOR_PAIR(2));
         fieldGrid.printNextShapes(nextShapes);
+
+        //wattron(score, COLOR_PAIR(4));
         fieldGrid.printScore(score);
+
 
         fieldGrid.pullShape(field, nextShapes, score);
 
