@@ -21,11 +21,13 @@ void Grid::printGrid()                                  // prints entire grid's 
     for(int i = 1; i < FIELDSIZEY - 1; i++) {
         for(int j = 1; j < FIELDSIZEX - 1; j++) {
             if(gridMap[i][j] == 0) {
-        
+
                 printw("%d", gridMap[i][j]);
             }
         }
+
     }
+
 
 }
 
@@ -64,6 +66,7 @@ void Grid::insertShape(Shapes z, WINDOW *field, WINDOW *nextShapes, WINDOW *scor
                 }
             }
         }
+
 }
 
 void Grid::pullShape(WINDOW *field, WINDOW *nextShapes, WINDOW *score)     // make sure to take score out, just testing things
@@ -882,9 +885,19 @@ void Grid::printField(WINDOW *field)                    // prints full field win
     for(int i = 1; i < FIELDSIZEY - 1; i++) {
         for(int j = 1; j < FIELDSIZEX - 1; j++) {
             draw_borders(field);
+           if(gridMap[i][j] == 0)
+           {
+               wattron(field, COLOR_PAIR(6));
+               mvwprintw(field, j, i, "%d", getCoord(i,j));
+               wattroff(field, COLOR_PAIR(6));
+           }
+           else{
+               wattron(field, COLOR_PAIR(1));
+               mvwprintw(field, j, i, "%d", getCoord(i, j));
 
-            wattron(field, COLOR_PAIR(1));              //makes the 0s and 1s cyan
-            mvwprintw(field, j, i, "%d", getCoord(i, j)); // prints data of grid in the field window
+           }
+                                             //makes the 0s and 1s cyan
+            //mvwprintw(field, j, i, "%d", getCoord(i, j)); // prints data of grid in the field window
 
         }
 
