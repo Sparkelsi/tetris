@@ -3,6 +3,9 @@
 
 #include <ncurses.h>
 
+#define SHAPEI  2
+#define SHAPEJ  4
+
 class Shapes {
 public:
     Shapes();
