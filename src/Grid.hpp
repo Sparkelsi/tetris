@@ -31,6 +31,7 @@ public:
     void moveAllDown();
     void rotate(WINDOW *field, WINDOW *nextShapes, WINDOW *score);
     void clearRow();
+    void shiftRow();
     void draw_borders(WINDOW *screen);
     void printField(WINDOW *field);
     void printNextShapes(WINDOW* nextShapes);
@@ -44,6 +45,7 @@ private:
     std::list<Shapes> shapelist;
 
     int tempColor;
+    int whichRow;
 
 
     int yOne = 0;

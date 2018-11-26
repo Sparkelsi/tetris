@@ -79,7 +79,7 @@ void Grid::pullShape(WINDOW *field, WINDOW *nextShapes, WINDOW *score)     // ma
         createList();
     }
 
-    tempColor = shapelist.front().getShapeID();
+    tempColor = shapelist.front().getShapeID();                     //used later in printField to get color.
     insertShape(shapelist.front(), field, nextShapes, score);       // inserts first shape into the grid
     shapelist.pop_front();                                          // deleting first item in the list
     shapelist.push_back(getRandomShape());                          // adding another random shape to back of list
@@ -161,7 +161,7 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
                 moveDown();
             } else if (key == ' ') {
                 moveAllDown();
-            }else if(key == KEY_LEFT) {
+            }else if(key == KEY_LEFT) {                     //create new key2 for left, right, down arrows.
                 moveLeft(field, nextShapes, score);
             }else if(key == KEY_RIGHT) {
                 moveRight(field, nextShapes, score);
@@ -876,12 +876,32 @@ void Grid::clearRow()                                   // clears row if it's fu
                 }
             }
             if(rowFull == FIELDSIZEX - 2) {             // checks to see if row is full
+                    whichRow = i;
                     for(int z = 1; z < FIELDSIZEX - 1; z++) {
                         gridMap[z][i] = 0;
                     }
+                    shiftRow();
             }                                           // resets counter back to zero after checking a row
              rowFull = 0;
         }
+
+        // printField()
+        // sleep(1);
+
+        //shiftRow();
+
+        // sleep(1);
+        //call shift row function after clearing row.
+}
+
+void Grid::shiftRow()
+{
+
+    for(int i = whichRow; i >= 0; i--) {
+        for(int j = 0; j < FIELDSIZEX - 1; j++) {
+            gridMap[j][i] = gridMap[j][i - 1];
+        }
+    }
 }
 
 void Grid::draw_borders(WINDOW *screen) {               // draws borders for each window
@@ -923,7 +943,7 @@ void Grid::printField(WINDOW *field)                    // prints full field win
 			}
 			else
 			{
-				wattron(field, COLOR_PAIR(tempColor));      //right not this prints the next shape color              
+				wattron(field, COLOR_PAIR(tempColor));              //gets color from insertShape function             
 				mvwprintw(field, j, i, "%d", getCoord(i, j));
 			}
 
@@ -997,5 +1017,8 @@ void Grid::fillRow()                                    // for testing purposes
     for(int j = 1; j < FIELDSIZEX - 1; j++) {
         gridMap[j][8] = 1;
         gridMap[j][4] = 1;
+        gridMap[j][7] = 1;
     }
+
+    gridMap[4][7] = 0;
 }

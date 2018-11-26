@@ -123,10 +123,15 @@ int main(int argc, char *argv[]) {
 
         fieldGrid.move(field, nextShapes, score);   // takes care of moving shape
 
-        //fieldGrid.fillRow();
-       // fieldGrid.printField(field);
-        //sleep(1);
+        // fieldGrid.fillRow();
+        // fieldGrid.printField(field);
+        // sleep(1);
         fieldGrid.clearRow();                       // make sure you add a shift row
+        //fieldGrid.printField(field);
+        //sleep(1);
+        //fieldGrid.shiftRow();
+        //fieldGrid.printField(field);
+        //sleep(1);
         fieldGrid.printField(field);
         sleep(1);
 
