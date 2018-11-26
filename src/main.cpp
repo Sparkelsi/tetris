@@ -3,7 +3,6 @@
 #include <stdlib.h> //srand, random
 #include <time.h>   //time
 #include <ncurses.h>
-//#include <curses.h>
 #include <unistd.h>
 #include "Shapes.hpp"
 #include "Grid.hpp"
@@ -26,21 +25,30 @@ int main(int argc, char *argv[]) {
 
     int coord;
 
-    initscr();
-    start_color();
-    init_pair(1, COLOR_CYAN, COLOR_CYAN);
-    init_pair(2, COLOR_YELLOW, COLOR_BLACK);
-    init_pair(3, COLOR_RED, COLOR_RED);
-    init_pair(4, COLOR_GREEN, COLOR_GREEN);
-    init_pair(5, COLOR_WHITE, COLOR_BLACK);
-    init_pair(6, COLOR_BLACK, COLOR_BLACK);
-    init_pair(7, COLOR_MAGENTA, COLOR_MAGENTA);
-    init_pair(8, COLOR_BLUE, COLOR_BLUE);
-    init_pair(9, COLOR_WHITE, COLOR_WHITE);
-    init_pair(10, COLOR_YELLOW, COLOR_YELLOW);
-    keypad(stdscr, true);
-    noecho();
-    curs_set(FALSE);
+	initscr();
+
+	if (!has_colors()) {
+		endwin();
+		puts("Your screen can't print colors. Exiting...");
+		return(1);
+	}
+	start_color();
+	init_pair(1, COLOR_CYAN, COLOR_CYAN);       //shapeID 1
+	init_pair(2, COLOR_YELLOW, COLOR_YELLOW);   //shapeID 2
+	init_pair(3, COLOR_RED, COLOR_RED);         //shapeID 3
+	init_pair(4, COLOR_GREEN, COLOR_GREEN);     //shapeID 4
+	init_pair(5, COLOR_WHITE, COLOR_WHITE);     //shapeID 5
+	init_pair(6, COLOR_MAGENTA, COLOR_MAGENTA); //shapeID 6
+	init_pair(7, COLOR_BLUE, COLOR_BLUE);       //shapeID 7
+
+
+
+	init_pair(10, COLOR_YELLOW, COLOR_BLACK);   //border color
+	init_pair(9, COLOR_WHITE, COLOR_BLACK);     //Next Shape and Score text color
+	init_pair(11, COLOR_BLACK, COLOR_BLACK);    //0's black on black in grid and next shape window
+	//keypad(stdscr, true);
+	noecho();
+	curs_set(FALSE);
 
 
 
@@ -52,16 +60,18 @@ int main(int argc, char *argv[]) {
     getmaxyx(stdscr, parent_y, parent_x);
 
     //WINDOW *field = newwin(parent_y - score_size, parent_x, 0, 0);
-    WINDOW *field = newwin(16, 16, 0, 0);
+    WINDOW *field = newwin(24, 24, 0, 0);
     //WINDOW *score = newwin(score_size, parent_x, parent_y - score_size, 0);
     WINDOW *nextShapes = newwin(19, 24, 0, 24);
     WINDOW *score = newwin(5, 24, 19, 24);
+    WINDOW *instructions = newwin(10,10,0,48);
 
    // wattron(field, COLOR_PAIR(1));
     fieldGrid.draw_borders(field);
     fieldGrid.draw_borders(nextShapes);
     fieldGrid.draw_borders(score);
-
+    
+    keypad(field, true);
 
     while(1) {
         getmaxyx(stdscr, new_y, new_x);
@@ -86,7 +96,9 @@ int main(int argc, char *argv[]) {
         //   draw_borders(score);
         // }
 
-
+        fieldGrid.draw_borders(instructions);
+        wrefresh(instructions);
+        
 
         fieldGrid.printField(field);
 

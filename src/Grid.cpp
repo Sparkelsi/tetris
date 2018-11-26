@@ -5,6 +5,9 @@
 #include <random>
 
 
+// when changing field size, must change window, insert shape, and move
+// specifically the j's in insert shape and move
+
 
 Grid::Grid()
     {
@@ -55,17 +58,18 @@ void Grid::insertShape(Shapes z, WINDOW *field, WINDOW *nextShapes, WINDOW *scor
     int x;
     int y;                                              // i and j are at insertion point (middle top of grid)
         for(int i = 1; i < 3; i++) {
-            for(int j = 6; j < 10; j++) {
+            for(int j = 10; j < 13; j++) {
                 x = i - 1;                              // place holders so i and j aren't affected
-                y = j - 6;
+                y = j - 10;
                 if(gridMap[j][i] == 1) {
                     gameOverDisp(field, nextShapes, score);     //displays game over window if top pieces hit top of grid
                 } else {
-
                     gridMap[j][i] = z.getShape(y, x);           // copies the shape into the grid
                 }
             }
+            
         }
+        
 
 }
 
@@ -75,6 +79,7 @@ void Grid::pullShape(WINDOW *field, WINDOW *nextShapes, WINDOW *score)     // ma
         createList();
     }
 
+    tempColor = shapelist.front().getShapeID();
     insertShape(shapelist.front(), field, nextShapes, score);       // inserts first shape into the grid
     shapelist.pop_front();                                          // deleting first item in the list
     shapelist.push_back(getRandomShape());                          // adding another random shape to back of list
@@ -102,7 +107,7 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
 
    int z = 0;                                           // i and j are at insertion point
     for(int i = 1; i < 3; i++) {                        // using specific i and j for more efficiency (this is where the shape is inserted)
-        for(int j = 6; j < 10; j++) {
+        for(int j = 10; j < 13; j++) {
             if(gridMap[j][i] == 1 && z == 0) {          // loops through to get coordinates of each piece of the shape
                 yOne = i;
                 xOne = j;
@@ -156,6 +161,12 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
                 moveDown();
             } else if (key == ' ') {
                 moveAllDown();
+            }else if(key == KEY_LEFT) {
+                moveLeft(field, nextShapes, score);
+            }else if(key == KEY_RIGHT) {
+                moveRight(field, nextShapes, score);
+            }else if(key == KEY_DOWN) {
+                moveDown();
             }
 
             gridMap[xOne][yOne] = 0;                    // makes current space of shape all 0's
@@ -200,7 +211,14 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
                 moveDown();
             } else if (key == ' ') {
                 moveAllDown();
+            }else if(key == KEY_LEFT) {
+                moveLeft(field, nextShapes, score);
+            }else if(key == KEY_RIGHT) {
+                moveRight(field, nextShapes, score);
+            }else if(key == KEY_DOWN) {
+                moveDown();
             }
+            
 
             gridMap[xOne][yOne] = 0;                    // makes current space of shape all 0's
             gridMap[xTwo][yTwo] = 0;
@@ -248,6 +266,12 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
                 moveDown();
             } else if (key == ' ') {
                 moveAllDown();
+            }else if(key == KEY_LEFT) {
+                moveLeft(field, nextShapes, score);
+            }else if(key == KEY_RIGHT) {
+                moveRight(field, nextShapes, score);
+            }else if(key == KEY_DOWN) {
+                moveDown();
             }
 
             gridMap[xOne][yOne] = 0;                    // makes current space of shape all 0's
@@ -296,6 +320,12 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
                 moveDown();
             } else if (key == ' ') {
                 moveAllDown();
+            }else if(key == KEY_LEFT) {
+                moveLeft(field, nextShapes, score);
+            }else if(key == KEY_RIGHT) {
+                moveRight(field, nextShapes, score);
+            }else if(key == KEY_DOWN) {
+                moveDown();
             }
 
             gridMap[xOne][yOne] = 0;                    // makes current space of shape all 0's
@@ -308,7 +338,7 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
             yThree++;
             yFour++;
 
-            attron(COLOR_PAIR(2));
+            //attron(COLOR_PAIR(2));
             gridMap[xOne][yOne] = 1;                    // puts 1's where shape is after moving down
             gridMap[xTwo][yTwo] = 1;
             gridMap[xThree][yThree] = 1;
@@ -858,7 +888,7 @@ void Grid::draw_borders(WINDOW *screen) {               // draws borders for eac
     int x, y, i;
 
   getmaxyx(screen, y, x);
-  wattron(screen, COLOR_PAIR(2));                       //starts the borders printing yellow
+  wattron(screen, COLOR_PAIR(10));                       //starts the borders printing yellow
   mvwprintw(screen, 0, 0, "+");                         // makes the 4 corners of the map
   mvwprintw(screen, y - 1, 0, "+");
   mvwprintw(screen, 0, x - 1, "+");
@@ -874,40 +904,40 @@ void Grid::draw_borders(WINDOW *screen) {               // draws borders for eac
     mvwprintw(screen, 0, i, "-");
     mvwprintw(screen, y - 1, i, "-");
   }
-  wattroff(screen, COLOR_PAIR(2));                      //ends the borders printing yellow
+  wattroff(screen, COLOR_PAIR(10));                      //ends the borders printing yellow
 
 }
 
 void Grid::printField(WINDOW *field)                    // prints full field window
 {
+	//need to make the previous shape maintain its color during each insertion.
+	for (int i = 1; i < FIELDSIZEY - 1; i++) {
+		for (int j = 1; j < FIELDSIZEX - 1; j++) {
+			draw_borders(field);
 
 
-    for(int i = 1; i < FIELDSIZEY - 1; i++) {
-        for(int j = 1; j < FIELDSIZEX - 1; j++) {
-            draw_borders(field);
-           if(gridMap[i][j] == 0)
-           {
-               wattron(field, COLOR_PAIR(6));
-               mvwprintw(field, j, i, "%d", getCoord(i,j));
-               wattroff(field, COLOR_PAIR(6));
-           }
-           else{
-               wattron(field, COLOR_PAIR(1));
-               mvwprintw(field, j, i, "%d", getCoord(i, j));
-
-           }
-                                             //makes the 0s and 1s cyan
-            //mvwprintw(field, j, i, "%d", getCoord(i, j)); // prints data of grid in the field window
-
-        }
+			if (gridMap[i][j] == 0)
+			{
+				wattron(field, COLOR_PAIR(11));                          //prints the 0s in black
+				mvwprintw(field, j, i, "%d", getCoord(i, j));
+			}
+			else
+			{
+				wattron(field, COLOR_PAIR(tempColor));      //right not this prints the next shape color              
+				mvwprintw(field, j, i, "%d", getCoord(i, j));
+			}
 
 
-    }
-    touchwin(field);                                //this is just to makes sure that changes are made to the field window.
-    wrefresh(field);
+		}
 
-    wclear(field);
 
+
+	}
+	//touchwin(field);                                //this is just to makes sure that changes are made to the field window.
+	wrefresh(field);
+
+	//wclear(field);
+    wattroff(field, COLOR_PAIR(tempColor));
 }
 
 void Grid::printNextShapes(WINDOW *nextShapes)          // prints full nextShapes window
@@ -938,6 +968,7 @@ void Grid::printScore(WINDOW *score)                    // prints full score win
     wclear(score);
     draw_borders(score);
     mvwprintw(score, 1, 1, "Score: ");
+
     wrefresh(score);
 }
 
@@ -957,7 +988,8 @@ void Grid::gameOverDisp(WINDOW *field, WINDOW *nextShapes, WINDOW *score)   // c
     mvwprintw(gameOver, 1, 1, "G A M E  O V E R");
     mvwprintw(gameOver, 2, 1, "Please click 'ctrl+c' to exit");
     wrefresh(gameOver);
-    sleep(2);
+    sleep(10);
+    
 }
 
 void Grid::fillRow()                                    // for testing purposes

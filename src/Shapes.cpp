@@ -173,95 +173,29 @@ void Shapes::makeShape(int shapeID) {
 
 void Shapes::printShape(WINDOW* nextShapes, int y, int x) {
 
-    for(int i = 0; i < SHAPEI; i++) {
-        for(int j = 0; j < SHAPEJ; j++) {
+	for (int i = 0; i < SHAPEI; i++) {
+		for (int j = 0; j < SHAPEJ; j++) {
 
-            if(shapeID == 1){
-                if(shape[i][j] == 0)
-                {
-                    wattron(nextShapes, COLOR_PAIR(6));                     //prints 0's black so they don't show.
-                    mvwprintw(nextShapes, y, x, "%d", shape[i][j]);
-                }
-                else
-                {
-                    wattron(nextShapes, COLOR_PAIR(1));                     //next shape prints cyan.
-                    mvwprintw(nextShapes, y, x, "%d", shape[i][j]);
-                }
-             }else if(shapeID == 2){
-                 if(shape[i][j] == 0)
-                {
-                    wattron(nextShapes, COLOR_PAIR(6));                      //prints 0's black so they don't show.
-                    mvwprintw(nextShapes, y, x, "%d", shape[i][j]);
-                }
-                else
-                {
-                    wattron(nextShapes, COLOR_PAIR(10));                     //next shape prints yellow.
-                    mvwprintw(nextShapes, y, x, "%d", shape[i][j]);
-                }
-             }else if(shapeID == 3){
-                 if(shape[i][j] == 0)
-                {
-                    wattron(nextShapes, COLOR_PAIR(6));                         //prints 0's black so they don't show.
-                    mvwprintw(nextShapes, y, x, "%d", shape[i][j]);
-                }
-                else
-                {
-                    wattron(nextShapes, COLOR_PAIR(3));                     //next shape prints red.
-                    mvwprintw(nextShapes, y, x, "%d", shape[i][j]);
-                }
-             }else if(shapeID == 4){
-                 if(shape[i][j] == 0)
-                {
-                    wattron(nextShapes, COLOR_PAIR(6));                      //prints 0's black so they don't show.
-                    mvwprintw(nextShapes, y, x, "%d", shape[i][j]);
-                }
-                else
-                {
-                    wattron(nextShapes, COLOR_PAIR(4));                     //next shape prints green.
-                    mvwprintw(nextShapes, y, x, "%d", shape[i][j]);
-                }
-             }else if(shapeID == 5){
-                 if(shape[i][j] == 0)
-                {
-                    wattron(nextShapes, COLOR_PAIR(6));                      //prints 0's black so they don't show.
-                    mvwprintw(nextShapes, y, x, "%d", shape[i][j]);
-                }
-                else
-                {
-                    wattron(nextShapes, COLOR_PAIR(9));                     //next shape prints white.
-                    mvwprintw(nextShapes, y, x, "%d", shape[i][j]);
-                }
-             }else if(shapeID == 6){
-                 if(shape[i][j] == 0)
-                {
-                    wattron(nextShapes, COLOR_PAIR(6));                      //prints 0's black so they don't show.
-                    mvwprintw(nextShapes, y, x, "%d", shape[i][j]);
-                }
-                else
-                {
-                    wattron(nextShapes, COLOR_PAIR(7));                     //next shape prints magenta.
-                    mvwprintw(nextShapes, y, x, "%d", shape[i][j]);
-                }
-             }else if(shapeID == 7){
-                 if(shape[i][j] == 0)
-                {
-                    wattron(nextShapes, COLOR_PAIR(6));                         //prints 0's black so they don't show.
-                    mvwprintw(nextShapes, y, x, "%d", shape[i][j]);
-                }
-                else
-                {
-                    wattron(nextShapes, COLOR_PAIR(8));                     //next shape prints blue.
-                    mvwprintw(nextShapes, y, x, "%d", shape[i][j]);
-                }
-             }
 
-            x++;
-        }
-        x -= 4;
-        y++;
+			if (shape[i][j] == 0)
+			{
+				wattron(nextShapes, COLOR_PAIR(11));                     //prints 0s black so they don't show.
+				mvwprintw(nextShapes, y, x, "%d", shape[i][j]);
+			}
+			else
+			{
+				wattron(nextShapes, COLOR_PAIR(shapeID));                     //next shape prints shapeID color_pair.
+				mvwprintw(nextShapes, y, x, "%d", shape[i][j]);
+			}
 
-        //mvwprintw(nextShapes, y, x, "\n");
-      //  std::cout << "\n";
-    }
-    //mvwprintw(nextShapes, y, x, "\n\n");
+
+			x++;
+		}
+		x -= 4;
+		y++;
+
+		//mvwprintw(nextShapes, y, x, "\n");
+	  //  std::cout << "\n";
+	}
+	//mvwprintw(nextShapes, y, x, "\n\n");
 }

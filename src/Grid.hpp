@@ -7,8 +7,8 @@
 #include <unistd.h>
 #include <list>
 
-#define FIELDSIZEX 16   // defined macros bc it was easier when changing size of field
-#define FIELDSIZEY 16
+#define FIELDSIZEX 24   // defined macros bc it was easier when changing size of field
+#define FIELDSIZEY 24
 
 //tbh ya might wanna keep it as a square, the size of the field
 
@@ -42,6 +42,8 @@ private:
     int gridMap[FIELDSIZEX][FIELDSIZEY]; //original is 10/24
     //int score;
     std::list<Shapes> shapelist;
+
+    int tempColor;
 
 
     int yOne = 0;
