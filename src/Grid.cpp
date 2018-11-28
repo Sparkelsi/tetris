@@ -67,6 +67,7 @@ void Grid::insertShape(Shapes z, WINDOW *field, WINDOW *nextShapes, WINDOW *scor
                     gridMap[j][i] = z.getShape(y, x);           // copies the shape into the grid
                 }
             }
+            wrefresh(field);
             
         }
         
@@ -83,6 +84,7 @@ void Grid::pullShape(WINDOW *field, WINDOW *nextShapes, WINDOW *score)     // ma
     insertShape(shapelist.front(), field, nextShapes, score);       // inserts first shape into the grid
     shapelist.pop_front();                                          // deleting first item in the list
     shapelist.push_back(getRandomShape());                          // adding another random shape to back of list
+    wrefresh(field);
    // printField(field);                                            // prints list at the end
 }
 
@@ -190,7 +192,7 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
             printField(field);                          // reprints everything out appearing to move down one space
             printNextShapes(nextShapes);
             printScore(score);
-            sleep(1);
+            usleep(50000);
         }
     } else if(xOne == xTwo || xOne == xFour || xOne == xThree) {    // Mirrored L, L, T, S Shape check
         while(gridMap[xTwo][nextyTwo] != 1 &&
@@ -243,7 +245,7 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
             printField(field);                          // reprints everything out appearing to move down one space
             printNextShapes(nextShapes);
             printScore(score);
-            sleep(1);
+            usleep(50000);                              //this is a much better speed.
 
         }
 
@@ -296,7 +298,7 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
             printField(field);                          // reprints everything out appearing to move down one space
             printNextShapes(nextShapes);
             printScore(score);
-            sleep(1);
+            usleep(50000);
 
         }
     } else {                                            // Line check
@@ -352,7 +354,7 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
             printField(field);                          // reprints everything out appearing to move down one space
             printNextShapes(nextShapes);
             printScore(score);
-            sleep(1);
+            usleep(50000);
 
         }
 
@@ -399,7 +401,7 @@ void Grid::moveRight(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                              // reprints everything out appearing to move right one space
         printNextShapes(nextShapes);
         printScore(score);
-        sleep(1);
+        usleep(50000);
 
     } else if(yTwo == yThree && yThree == yFour &&      // Mirrored L, L, T shape check
         gridMap[nextxOne][yOne] != 1 &&
@@ -428,7 +430,7 @@ void Grid::moveRight(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                              // reprints everything out appearing to move right one space
         printNextShapes(nextShapes);
         printScore(score);
-        sleep(1);
+        usleep(50000);
 
     } else if(yOne == yTwo && yThree == yFour &&        // Cube, S, Z shape check
         gridMap[nextxTwo][yTwo] != 1 &&
@@ -457,7 +459,7 @@ void Grid::moveRight(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                              // reprints everything out appearing to move right one space
         printNextShapes(nextShapes);
         printScore(score);
-        sleep(1);
+        usleep(50000);
 
         }
 
@@ -498,7 +500,7 @@ void Grid::moveLeft(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                              // reprints everything out appearing to move left one space
         printNextShapes(nextShapes);
         printScore(score);
-        sleep(1);
+        usleep(50000);
 
     } else if(yTwo == yThree && yThree == yFour &&      // Mirrored L, L, T shape check
         gridMap[nextxOne][yOne] != 1 &&
@@ -527,7 +529,7 @@ void Grid::moveLeft(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                              // reprints everything out appearing to move left one space
         printNextShapes(nextShapes);
         printScore(score);
-        sleep(1);
+        usleep(50000);
 
     } else if(yOne == yTwo && yThree == yFour &&        // Cube, S, Z shape check
         gridMap[nextxOne][yOne] != 1 &&
@@ -556,7 +558,7 @@ void Grid::moveLeft(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                              // reprints everything out appearing to move left one space
         printNextShapes(nextShapes);
         printScore(score);
-        sleep(1);
+        usleep(50000);
 
     }
 
@@ -886,11 +888,11 @@ void Grid::clearRow()                                   // clears row if it's fu
         }
 
         // printField()
-        // sleep(1);
+        // usleep(50000);
 
         //shiftRow();
 
-        // sleep(1);
+        // usleep(50000);
         //call shift row function after clearing row.
 }
 
@@ -930,6 +932,7 @@ void Grid::draw_borders(WINDOW *screen) {               // draws borders for eac
 
 void Grid::printField(WINDOW *field)                    // prints full field window
 {
+    wclear(field);
 	//need to make the previous shape maintain its color during each insertion.
 	for (int i = 1; i < FIELDSIZEY - 1; i++) {
 		for (int j = 1; j < FIELDSIZEX - 1; j++) {
@@ -946,18 +949,11 @@ void Grid::printField(WINDOW *field)                    // prints full field win
 				wattron(field, COLOR_PAIR(tempColor));              //gets color from insertShape function             
 				mvwprintw(field, j, i, "%d", getCoord(i, j));
 			}
-
-
 		}
-
-
-
-	}
-	//touchwin(field);                                //this is just to makes sure that changes are made to the field window.
+	}	
+	
+    touchwin(field);                                //this is just to makes sure that changes are made to the field window.
 	wrefresh(field);
-
-	//wclear(field);
-    wattroff(field, COLOR_PAIR(tempColor));
 }
 
 void Grid::printNextShapes(WINDOW *nextShapes)          // prints full nextShapes window
