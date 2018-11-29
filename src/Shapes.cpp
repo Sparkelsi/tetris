@@ -1,11 +1,17 @@
+/*
+Testris Inspired Game - Project for Data Structures
+Kelsi Andrews
+Karen Nason
+*/
+
 #include "Shapes.hpp"
 #include <iostream>
 
-// #define SHAPEI = 2;
-// #define SHAPEJ = 4;
 
-Shapes::Shapes() 
+
+Shapes::Shapes()
     :shapeID(0)
+
     {
         for(int i = 0; i < SHAPEI; i++) {
             for(int j = 0; j < SHAPEJ; j++) {
@@ -25,21 +31,13 @@ int Shapes::getShapeID() {
 }
 
 int Shapes::getShape(int x, int y) { //this needs to change with size of grid
-    // for(int i = 0; i < SHAPEI; i++) {
-    //     for(int j = 0; j < SHAPEJ; j++) {
-    //         if(i == y) {
-    //             if(j == x) {
-    //                 return shape[x][y];
-    //             }
-    //         }
-    //     }
-    // }
-    //std::cout << "you did something wrong\n";
+    
     if(y < SHAPEI && x < SHAPEJ)
         return shape[y][x];
     else
         throw std::out_of_range("wrong");
 }
+
 
 /*  1 = cube
 *   2 = line
@@ -50,15 +48,17 @@ int Shapes::getShape(int x, int y) { //this needs to change with size of grid
 *   7 = mirrored L shape
 */
 void Shapes::makeShape(int shapeID) {
-
+   
     switch(shapeID) {
         case 1:
             for(int i = 0; i < SHAPEI; i++) {
                 for(int j = 0; j < SHAPEJ; j++) {
                     if(j == 1 || j == 2){
-
+                        
                         shape[i][j] = 1;
+                        
                     } else {
+                       
                         shape[i][j] = 0;
                     }
                 }
@@ -69,9 +69,11 @@ void Shapes::makeShape(int shapeID) {
             for(int i = 0; i < SHAPEI; i++) {
                 for(int j = 0; j < SHAPEJ; j++) {
                     if(i == 1){
-
+                        
                         shape[i][j] = 1;
+                        
                     } else {
+                        
                         shape[i][j] = 0;
                     }
                 }
@@ -82,12 +84,16 @@ void Shapes::makeShape(int shapeID) {
             for(int i = 0; i < SHAPEI; i++) {
                 for(int j = 0; j < SHAPEJ; j++) {
                     if(j == 1) {
-
+                        
                         shape[i][j] = 1;
+                        
                     } else if(i == 1 && j != 3){
-
+                        
                         shape[i][j] = 1;
+                        
+
                     } else {
+                       
                         shape[i][j] = 0;
                     }
                 }
@@ -98,15 +104,19 @@ void Shapes::makeShape(int shapeID) {
             for(int i = 0; i < SHAPEI; i++) {
                 for(int j = 0; j < SHAPEJ; j++) {
                     if(j == 1) {
-
+                        
                         shape[i][j] = 1;
+                        
                     } else if(i == 1 && j ==0) {
-
+                        
                         shape[i][j] = 1;
+                        
                     } else if(i == 0 && j == 2) {
-
+                        
                         shape[i][j] = 1;
+                        
                     } else {
+                        
                         shape[i][j] = 0;
                     }
                 }
@@ -117,15 +127,18 @@ void Shapes::makeShape(int shapeID) {
             for(int i = 0; i < SHAPEI; i++) {
                 for(int j = 0; j < SHAPEJ; j++) {
                     if(j == 1) {
-
+                       
                         shape[i][j] = 1;
                     } else if(i == 0 && j == 0) {
-
+                        
                         shape[i][j] = 1;
+                       
                     } else if(i == 1 && j == 2) {
-
+                        
                         shape[i][j] = 1;
+                        
                     } else {
+                        
                         shape[i][j] = 0;
                     }
                 }
@@ -136,12 +149,15 @@ void Shapes::makeShape(int shapeID) {
             for(int i = 0; i < SHAPEI; i++) {
                 for(int j = 0; j < SHAPEJ; j++) {
                     if(j == 0){
-
+                        
                         shape[i][j] = 1;
+                        
                     } else if(i == 1 && j != 3){
-
+                        
                         shape[i][j] = 1;
+                        
                     } else {
+                        
                         shape[i][j] = 0;
                     }
                 }
@@ -152,50 +168,54 @@ void Shapes::makeShape(int shapeID) {
             for(int i = 0; i < SHAPEI; i++) {
                 for(int j = 0; j < SHAPEJ; j++) {
                     if(j == 2){
-
+                       
                         shape[i][j] = 1;
+                        
                     } else if(i == 1 && j != 3){
-
+                        
                         shape[i][j] = 1;
+                        
                     } else {
+                        
                         shape[i][j] = 0;
                     }
                 }
             }
-            refresh();
+            refresh();                  
             break;
         default:
             break;
     }
-
+   
 }
 
 
 void Shapes::printShape(WINDOW* nextShapes, int y, int x) {
+    
+    for(int i = 0; i < SHAPEI; i++) {
+        for(int j = 0; j < SHAPEJ; j++) {
 
-	for (int i = 0; i < SHAPEI; i++) {
-		for (int j = 0; j < SHAPEJ; j++) {
-
-
-			if (shape[i][j] == 0)
-			{
-				wattron(nextShapes, COLOR_PAIR(11));                     //prints 0s black so they don't show.
-				mvwprintw(nextShapes, y, x, "%d", shape[i][j]);
-			}
-			else
-			{
-				wattron(nextShapes, COLOR_PAIR(shapeID));                     //next shape prints shapeID color_pair.
-				mvwprintw(nextShapes, y, x, "%d", shape[i][j]);
-			}
-
-
-			x++;
-		}
-		x -= 4;
-		y++;
-
-		//mvwprintw(nextShapes, y, x, "\n");
-	  //  std::cout << "\n";
-	}
-	//mvwprintw(nextShapes, y, x, "\n\n");
+            
+                if(shape[i][j] == 0)
+                {
+                    wattron(nextShapes, COLOR_PAIR(11));                     //prints 0s black so they don't show.
+                    mvwprintw(nextShapes, y, x, "%d", shape[i][j]);
+                }
+                else
+                {
+                    wattron(nextShapes, COLOR_PAIR(shapeID));                     //next shape prints shapeID color_pair.
+                    mvwprintw(nextShapes, y, x, "%d", shape[i][j]);
+                }
+             
+         
+            x++;
+        }
+        x -= 4;
+        y++;
+      
+       
+    }
+    
 }
+
+

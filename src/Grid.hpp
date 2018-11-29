@@ -1,23 +1,29 @@
+/*
+Testris Inspired Game - Project for Data Structures
+Kelsi Andrews
+Karen Nason
+
+Header file for Grid Class in Tetris Inspired Game
+*/
+
 #ifndef GRID_HPP
 #define GRID_HPP
 #include "Shapes.hpp"
-#include <stdlib.h> //srand, random
-#include <time.h>   //time
 #include <ncurses.h>
 #include <unistd.h>
+#include <string>
 #include <list>
 
 #define FIELDSIZEX 24   // defined macros bc it was easier when changing size of field
 #define FIELDSIZEY 24
 
-//tbh ya might wanna keep it as a square, the size of the field
 
 class Grid {
 public:
     Grid();
     ~Grid() = default;
 
-    void printGrid(); // i think we can delete this
+    
     void createList();
     Shapes getRandomShape();
     void insertShape(Shapes x, WINDOW *field, WINDOW *nextShapes, WINDOW *score);
@@ -37,11 +43,12 @@ public:
     void printNextShapes(WINDOW* nextShapes);
     void printScore(WINDOW *score);
     void gameOverDisp(WINDOW *field, WINDOW *nextShapes, WINDOW *score);
+    void runGame(WINDOW *field, WINDOW *nextShapes, WINDOW *score);
     void fillRow(); // only used for testing
 
 private:
     int gridMap[FIELDSIZEX][FIELDSIZEY]; //original is 10/24
-    //int score;
+    static int _score;
     std::list<Shapes> shapelist;
 
     int tempColor;

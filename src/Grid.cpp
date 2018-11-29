@@ -1,10 +1,16 @@
+/*
+Testris Inspired Game - Project for Data Structures
+Kelsi Andrews
+Karen Nason
+*/
+
 #include "Grid.hpp"
 #include "Shapes.hpp"
 #include <ncurses.h>
 #include <iostream>
 #include <random>
 
-
+int Grid::_score = 0;               //static int to keep track of the score.
 // when changing field size, must change window, insert shape, and move
 // specifically the j's in insert shape and move
 
@@ -18,21 +24,7 @@ Grid::Grid()
         }
     }
 
-void Grid::printGrid()                                  // prints entire grid's data
-{
 
-    for(int i = 1; i < FIELDSIZEY - 1; i++) {
-        for(int j = 1; j < FIELDSIZEX - 1; j++) {
-            if(gridMap[i][j] == 0) {
-
-                printw("%d", gridMap[i][j]);
-            }
-        }
-
-    }
-
-
-}
 
 void Grid::createList()
 {
@@ -44,6 +36,9 @@ void Grid::createList()
 
 Shapes Grid::getRandomShape()
 {
+
+    // Proper seeding of mt19937 taken from:
+    // https://kristerw.blogspot.com/2017/05/seeding-stdmt19937-random-number-engine.html
     std::random_device placeShape;                      // creates a Shape object with a random shapeID
     std::mt19937 gen(placeShape());
     std::uniform_int_distribution<> distOne(1, 7);
@@ -58,11 +53,13 @@ void Grid::insertShape(Shapes z, WINDOW *field, WINDOW *nextShapes, WINDOW *scor
     int x;
     int y;                                              // i and j are at insertion point (middle top of grid)
         for(int i = 1; i < 3; i++) {
-            for(int j = 10; j < 13; j++) {
+            for(int j = 10; j < 14; j++) {
                 x = i - 1;                              // place holders so i and j aren't affected
                 y = j - 10;
                 if(gridMap[j][i] == 1) {
+                    
                     gameOverDisp(field, nextShapes, score);     //displays game over window if top pieces hit top of grid
+                    
                 } else {
                     gridMap[j][i] = z.getShape(y, x);           // copies the shape into the grid
                 }
@@ -109,7 +106,7 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
 
    int z = 0;                                           // i and j are at insertion point
     for(int i = 1; i < 3; i++) {                        // using specific i and j for more efficiency (this is where the shape is inserted)
-        for(int j = 10; j < 13; j++) {
+        for(int j = 10; j < 14; j++) {
             if(gridMap[j][i] == 1 && z == 0) {          // loops through to get coordinates of each piece of the shape
                 yOne = i;
                 xOne = j;
@@ -163,12 +160,6 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
                 moveDown();
             } else if (key == ' ') {
                 moveAllDown();
-            }else if(key == KEY_LEFT) {                     //create new key2 for left, right, down arrows.
-                moveLeft(field, nextShapes, score);
-            }else if(key == KEY_RIGHT) {
-                moveRight(field, nextShapes, score);
-            }else if(key == KEY_DOWN) {
-                moveDown();
             }
 
             gridMap[xOne][yOne] = 0;                    // makes current space of shape all 0's
@@ -213,12 +204,6 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
                 moveDown();
             } else if (key == ' ') {
                 moveAllDown();
-            }else if(key == KEY_LEFT) {
-                moveLeft(field, nextShapes, score);
-            }else if(key == KEY_RIGHT) {
-                moveRight(field, nextShapes, score);
-            }else if(key == KEY_DOWN) {
-                moveDown();
             }
             
 
@@ -268,12 +253,6 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
                 moveDown();
             } else if (key == ' ') {
                 moveAllDown();
-            }else if(key == KEY_LEFT) {
-                moveLeft(field, nextShapes, score);
-            }else if(key == KEY_RIGHT) {
-                moveRight(field, nextShapes, score);
-            }else if(key == KEY_DOWN) {
-                moveDown();
             }
 
             gridMap[xOne][yOne] = 0;                    // makes current space of shape all 0's
@@ -322,12 +301,6 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
                 moveDown();
             } else if (key == ' ') {
                 moveAllDown();
-            }else if(key == KEY_LEFT) {
-                moveLeft(field, nextShapes, score);
-            }else if(key == KEY_RIGHT) {
-                moveRight(field, nextShapes, score);
-            }else if(key == KEY_DOWN) {
-                moveDown();
             }
 
             gridMap[xOne][yOne] = 0;                    // makes current space of shape all 0's
@@ -340,7 +313,6 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
             yThree++;
             yFour++;
 
-            //attron(COLOR_PAIR(2));
             gridMap[xOne][yOne] = 1;                    // puts 1's where shape is after moving down
             gridMap[xTwo][yTwo] = 1;
             gridMap[xThree][yThree] = 1;
@@ -562,10 +534,6 @@ void Grid::moveLeft(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
 
     }
 
-    // gridMap[xOne][yOne] = 1;                         // reassigns 1's to where the shape was if it can't move
-    // gridMap[xTwo][yTwo] = 1;                         // bc previously the shape was made into 0's
-    // gridMap[xThree][yThree] = 1;                     // testing to see if arbitray, take out if nothing breaks
-    // gridMap[xFour][yFour] = 1;
 
     printField(field);                                  // reprints everything out if the shape can't move left
     printNextShapes(nextShapes);
@@ -883,17 +851,12 @@ void Grid::clearRow()                                   // clears row if it's fu
                         gridMap[z][i] = 0;
                     }
                     shiftRow();
+                    _score++;
             }                                           // resets counter back to zero after checking a row
              rowFull = 0;
         }
-
-        // printField()
-        // usleep(50000);
-
-        //shiftRow();
-
-        // usleep(50000);
-        //call shift row function after clearing row.
+    refresh();
+        
 }
 
 void Grid::shiftRow()
@@ -978,13 +941,14 @@ void Grid::printNextShapes(WINDOW *nextShapes)          // prints full nextShape
 
 }
 
+
+
 void Grid::printScore(WINDOW *score)                    // prints full score window
 {
-
     wclear(score);
     draw_borders(score);
-    mvwprintw(score, 1, 1, "Score: ");
-
+    mvwprintw(score,1, 1, "Score: ");
+    mvwprintw(score, 1, 8, "%d", _score);
     wrefresh(score);
 }
 
@@ -997,15 +961,56 @@ void Grid::gameOverDisp(WINDOW *field, WINDOW *nextShapes, WINDOW *score)   // c
     wrefresh(nextShapes);
     wrefresh(score);
 
+    
 
+    
+    
     WINDOW *gameOver = newwin(24, 48, 0, 0);
-
+    while(1)
+    {
     draw_borders(gameOver);
     mvwprintw(gameOver, 1, 1, "G A M E  O V E R");
     mvwprintw(gameOver, 2, 1, "Please click 'ctrl+c' to exit");
     wrefresh(gameOver);
     sleep(10);
+    }
     
+}
+
+void Grid::runGame(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
+{
+
+        printField(field);
+
+        printNextShapes(nextShapes);
+
+        printScore(score);
+
+
+        pullShape(field, nextShapes, score);
+
+        wclear(field);
+        wclear(nextShapes);
+        wclear(score);
+
+        draw_borders(nextShapes);
+        draw_borders(field);
+
+        printField(field);
+        sleep(1);
+
+        move(field, nextShapes, score);   // takes care of moving shape
+
+        printField(field);
+
+        clearRow();                       
+        wrefresh(field);
+        printField(field);
+        wrefresh(field);
+
+        sleep(1);
+        
+        
 }
 
 void Grid::fillRow()                                    // for testing purposes

@@ -1,3 +1,11 @@
+/*
+Testris Inspired Game - Project for Data Structures
+Kelsi Andrews
+Karen Nason
+
+Header file for Shape class in Tetris Inpsired Game
+*/
+
 #ifndef SHAPES_HPP
 #define SHAPES_HPP
 
@@ -14,15 +22,16 @@ public:
 
     int getShapeID();
     int getShape(int x, int y);
+    //int getShapej(int x, int y);
     void makeShape(int shapeID);
     void printShape(WINDOW *nextShapes, int y, int x);
+    //int getShapeID() { return shapeID; }
 
 
 private:
     int shapeID;
-    int shape[2][4];
-
-
+    int shape[SHAPEI][SHAPEJ];
+   
 };
 
 
