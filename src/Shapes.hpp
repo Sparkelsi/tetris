@@ -1,18 +1,16 @@
 /*
-Testris Inspired Game - Project for Data Structures
+Tetris Inspired Game - Project for Data Structures
 Kelsi Andrews
 Karen Nason
 
 Header file for Shape class in Tetris Inpsired Game
+
 */
 
 #ifndef SHAPES_HPP
 #define SHAPES_HPP
 
 #include <ncurses.h>
-
-#define SHAPEI  2
-#define SHAPEJ  4
 
 class Shapes {
 public:
@@ -22,16 +20,15 @@ public:
 
     int getShapeID();
     int getShape(int x, int y);
-    //int getShapej(int x, int y);
     void makeShape(int shapeID);
     void printShape(WINDOW *nextShapes, int y, int x);
-    //int getShapeID() { return shapeID; }
 
 
 private:
     int shapeID;
-    int shape[SHAPEI][SHAPEJ];
-   
+    int shape[2][4];
+
+
 };
 
 

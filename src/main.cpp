@@ -1,5 +1,5 @@
 /*
-Testris Inspired Game - Project for Data Structures
+Tetris Inspired Game - Project for Data Structures
 Kelsi Andrews
 Karen Nason
 
@@ -17,11 +17,11 @@ Source file to run simulation of Tetris inspired Game using Ncurses.h for graphi
 
 
 int main(int argc, char *argv[]) {
-    int parent_x, parent_y, new_x, new_y;
-    int next_y = 0;
-    int max_y = 24;
-    int y = 1;
-    int x = 10;
+    // int parent_x, parent_y, new_x, new_y;
+    // int next_y = 0;
+    // int max_y = 24;
+    // int y = 1;
+    // int x = 10;
 
 	initscr();                                  //ncurses, initialize the main screen
 
@@ -55,24 +55,23 @@ int main(int argc, char *argv[]) {
     fieldGrid.createList();                             // creates list of shapes
 
     // set up initial windows
-    getmaxyx(stdscr, parent_y, parent_x);
+    //getmaxyx(stdscr, parent_y, parent_x);
 
     WINDOW *field = newwin(24, 24, 0, 0);
     WINDOW *nextShapes = newwin(19, 24, 0, 24);
     WINDOW *score = newwin(5, 24, 19, 24);
-    
-    
+
+
     keypad(field, true);
 
     while(1) {
-        getmaxyx(stdscr, new_y, new_x);
+        //getmaxyx(stdscr, new_y, new_x);
 
         fieldGrid.runGame(field, nextShapes, score);
-        
+
     }
-    
+
     endwin();
 
     return 0;
 }
-
