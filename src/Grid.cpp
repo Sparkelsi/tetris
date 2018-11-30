@@ -16,8 +16,8 @@ int Grid::_score = 0;               //static int to keep track of the score.
 
 Grid::Grid()
     {
-        for(int i = 0; i < FIELDSIZEY; i++) {
-            for(int j = 0; j < FIELDSIZEX; j++) {
+        for(int i = 0; i < FIELDSIZE; i++) {
+            for(int j = 0; j < FIELDSIZE; j++) {
                 gridMap[i][j] = 0;
             }
         }
@@ -77,8 +77,8 @@ int Grid::getCoord(int y, int x)
 
 void Grid::resetGrid()                                  // testing purposes only
 {
-    for(int i = 0; i < FIELDSIZEY; i++) {               //resets grid, only for testing as of now
-        for(int j = 0; j < FIELDSIZEX; j++)
+    for(int i = 0; i < FIELDSIZE; i++) {               //resets grid, only for testing as of now
+        for(int j = 0; j < FIELDSIZE; j++)
         {
             gridMap[i][j] = 0;
         }
@@ -122,25 +122,24 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
     nextxThree = 1;
     nextxFour = 1;
 
-    nextyOne = yOne + 1;                                // have to check next space as to not go out of bounds
-    nextyTwo = yTwo + 1;
-    nextyThree = yThree + 1;
-    nextyFour = yFour + 1;
+    incrementNextY();                                   // have to check next space as to not go out of bounds
 
     if(xOne == xThree && xTwo == xFour) {               // Cube check
         int gridShape = 1;
         while(gridMap[xThree][nextyThree] == 0 &&
             gridMap[xFour][nextyFour] == 0 &&
-            nextyThree != (FIELDSIZEY - 1) &&
-            nextyFour != (FIELDSIZEY - 1)) {
+            nextyThree != (FIELDSIZE - 1) &&
+            nextyFour != (FIELDSIZE - 1)) {
 
             halfdelay(1);                               // continues if no input is given
             key = getch();                              // gets user input
 
             if(key == 'd') {
                 moveRight(field, nextShapes, score);
+                decrementNextX();                       // decrements so still able to move left
             } else if (key == 'a') {
                 moveLeft(field, nextShapes, score);
+                incrementNextX();                       // increments so still able to move right
             } else if (key == 's') {
                 moveDown();
             } else if (key == ' ') {
@@ -149,25 +148,19 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
                 rotate(gridShape, field, nextShapes, score);
             }
 
-            gridMap[xOne][yOne] = 0;                    // makes current space of shape all 0's
-            gridMap[xTwo][yTwo] = 0;
-            gridMap[xThree][yThree] = 0;
-            gridMap[xFour][yFour] = 0;
+            makeZero();                                 // makes current space of shape all 0's
 
-            yOne++;                                     // increments current space of shape to appear to move down
-            yTwo++;
-            yThree++;
-            yFour++;
+            incrementY();                               // increments current space of shape to appear to move down
 
-            insertNum(gridShape);                        // puts shape into grid after moving down
+            insertNum(gridShape);                       // puts shape into grid after moving down
 
-            nextyThree = yThree + 1;                    // have to check next space as to not go out of bounds
-            nextyFour = yFour + 1;
+            incrementNextY();                           // have to check next space as to not go out of bounds
 
             printField(field);                          // reprints everything out appearing to move down one space
             printNextShapes(nextShapes);
             printScore(score);
-            sleep(1);
+            // sleep(1);
+            // usleep(300000);
         }
     } else if(xOne == xTwo || xOne == xFour || xOne == xThree) {    // Mirrored L, L, T, S Shape check
 
@@ -180,96 +173,218 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         } else if(xOne == xFour && yTwo == yThree && yThree == yFour) {
             gridShape = 7;
         }
-        while(gridMap[xTwo][nextyTwo] == 0 &&
+        while(((gridMap[xTwo][nextyTwo] == 0 &&
             gridMap[xThree][nextyThree] == 0 &&
-            gridMap[xFour][nextyFour] == 0 &&
-            nextyTwo != (FIELDSIZEY - 1) &&
-            nextyThree != (FIELDSIZEY - 1) &&
-            nextyFour != (FIELDSIZEY - 1)) {
+            gridMap[xFour][nextyFour] == 0) ||
+            (gridMap[xOne][nextyOne] == 0 &&
+            gridMap[xThree][nextyThree] == 0 &&
+            gridMap[xFour][nextyFour] == 0) ||
+            (gridMap[xOne][nextyOne] == 0 &&
+            gridMap[xTwo][nextyTwo] == 0 &&
+            gridMap[xFour][nextyFour] == 0)) &&
+            nextyTwo != (FIELDSIZE - 1) &&
+            nextyThree != (FIELDSIZE - 1) &&
+            nextyFour != (FIELDSIZE - 1)) {
 
             halfdelay(1);                               // continues if no input is given
             key = getch();                              // gets user input
 
             if(key == 'd') {
                 moveRight(field, nextShapes, score);
+                decrementNextX();                       // decrements so still able to move left
             } else if (key == 'a') {
                 moveLeft(field, nextShapes, score);
+                incrementNextX();                       // increments so still able to move right
             } else if (key == 's') {
                 moveDown();
             } else if (key == ' ') {
                 moveAllDown();
             } else if (key == 'r') {
                 rotate(gridShape, field, nextShapes, score);
+                // if((xOne == xTwo && xTwo == xFour) ||        // 3 -- shape 3 rotation 1 -- 6 shape rotation 3
+                //     (xOne == xThree && xThree == xFour) ||      // 2 -- shape 3 rotation 3 -- 6 shape rotation 1
+                //     (xOne == xTwo && xTwo == xThree) ||         // 4 -- shape 7 rotation 1
+                //     (xTwo == xThree && xThree == xFour)) //||      // 1 -- shape 7 rotation 3 --
+                //     {                                          // still need to finish shape 4 here S shape
+                    while(((gridMap[xOne][nextyOne] == 0 &&
+                        gridMap[xFour][nextyFour] == 0) ||
+                        (gridMap[xThree][nextyThree] == 0 &&
+                        gridMap[xFour][nextyFour] == 0) ||
+                        (gridMap[xTwo][nextyTwo] == 0 &&
+                        gridMap[xFour][nextyFour] == 0) ||
+                        (gridMap[xOne][nextyOne] == 0 &&
+                        gridMap[xThree][nextyThree] == 0)) &&
+                        nextyFour != (FIELDSIZE - 1)) {
+
+                        halfdelay(1);                           // continues if no input is given
+                        key = getch();                          // gets users input
+
+                        if(key == 'd') {
+                            moveRight(field, nextShapes, score);
+                            decrementNextX();                   // decrements so still able to move left
+                        } else if (key == 'a') {
+                            moveLeft(field, nextShapes, score);
+                            incrementNextX();                   // increments so still able to move right
+                        } else if (key == 's') {
+                            moveDown();
+                        } else if (key == ' ') {
+                            moveAllDown();
+                        } else if (key == 'r') {
+                            rotate(gridShape, field, nextShapes, score);
+                            break;
+                        }
+                        if (((gridMap[xOne][nextyOne] == 0 &&
+                            gridMap[xFour][nextyFour] == 0) ||
+                            (gridMap[xThree][nextyThree] == 0 &&
+                            gridMap[xFour][nextyFour] == 0) ||
+                            (gridMap[xTwo][nextyTwo] == 0 &&
+                            gridMap[xFour][nextyFour] == 0) ||
+                            (gridMap[xOne][nextyOne] == 0 &&
+                            gridMap[xThree][nextyThree] == 0)) &&
+                            nextyFour != (FIELDSIZE - 1)) {
+
+                            makeZero();                             // makes current space of shape all 0's
+
+                            incrementY();                           // increments current space of shape to appear to move down
+
+                            insertNum(gridShape);                   // puts shape into grid after moving down
+
+                            // mvwprintw(score, 4, 4, "%d", shapeRotation);
+                            // wrefresh(score);
+                            // sleep(1);
+
+                            incrementNextY();                       // have to check next space as to not go out of bounds
+
+                            printField(field);                      // reprints everything out appearing to move down one space
+                            printNextShapes(nextShapes);
+                            printScore(score);
+                            // sleep(1);
+                            // usleep(300000);
+                        }
+
+                    }
+                }
+            //}
+
+            if(((gridMap[xTwo][nextyTwo] == 0 &&                    // have to DOUBLE check due to rotation
+            gridMap[xThree][nextyThree] == 0 &&
+            gridMap[xFour][nextyFour] == 0) ||
+            (gridMap[xOne][nextyOne] == 0 &&
+            gridMap[xThree][nextyThree] == 0 &&
+            gridMap[xFour][nextyFour] == 0) ||
+            (gridMap[xOne][nextyOne] == 0 &&
+            gridMap[xTwo][nextyTwo] == 0 &&
+            gridMap[xFour][nextyFour] == 0)) &&
+            nextyTwo != (FIELDSIZE - 1) &&
+            nextyThree != (FIELDSIZE - 1) &&
+            nextyFour != (FIELDSIZE - 1)) {
+
+                makeZero();                             // makes current space of shape all 0's
+
+                incrementY();                           // increments current space of shape to appear to move down
+
+                insertNum(gridShape);                   // puts shape into grid after moving down
+
+                incrementNextY();                       // have to check next space as to not go out of bounds
+
+                printField(field);                      // reprints everything out appearing to move down one space
+                printNextShapes(nextShapes);
+                printScore(score);
+                // sleep(1);
+                // usleep(300000);
             }
-
-            gridMap[xOne][yOne] = 0;                    // makes current space of shape all 0's
-            gridMap[xTwo][yTwo] = 0;
-            gridMap[xThree][yThree] = 0;
-            gridMap[xFour][yFour] = 0;
-
-            yOne++;                                     // increments current space of shape to appear to move down
-            yTwo++;
-            yThree++;
-            yFour++;
-
-            insertNum(gridShape);                        // puts shape into grid after moving down
-
-            nextyTwo = yTwo + 1;                        // have to check next space as to not go out of bounds
-            nextyThree = yThree + 1;
-            nextyFour = yFour + 1;
-
-
-            printField(field);                          // reprints everything out appearing to move down one space
-            printNextShapes(nextShapes);
-            printScore(score);
-            sleep(1);
 
         }
 
     } else if(xTwo == xThree) {                         // Z shape check
-        gridShape = 5;
+        gridShape = 5;                                  // ythree and yfour too i think causes problems
         while(gridMap[xOne][nextyOne] == 0 &&
             gridMap[xThree][nextyThree] == 0 &&
             gridMap[xFour][nextyFour] == 0 &&
-            nextyOne != (FIELDSIZEY - 1) &&
-            nextyThree != (FIELDSIZEY - 1) &&
-            nextyFour != (FIELDSIZEY - 1)) {
+            nextyOne != (FIELDSIZE - 1) &&
+            nextyThree != (FIELDSIZE - 1) &&
+            nextyFour != (FIELDSIZE - 1)) {
 
             halfdelay(1);                               // continues if no input is given
             key = getch();                              // gets user input
 
             if(key == 'd') {
                 moveRight(field, nextShapes, score);
+                decrementNextX();                       // decrements so still able to move left
             } else if (key == 'a') {
                 moveLeft(field, nextShapes, score);
+                incrementNextX();                       // increments so still able to move right
             } else if (key == 's') {
                 moveDown();
             } else if (key == ' ') {
                 moveAllDown();
             } else if (key == 'r') {
                 rotate(gridShape, field, nextShapes, score);
+                while(gridMap[xThree][nextyThree] == 0 &&
+                    gridMap[xFour][nextyFour] == 0 &&
+                    nextyFour != (FIELDSIZE - 1)) {
+
+                    halfdelay(1);                               // continues if no input is given
+                    key = getch();                              // gets user input
+
+                    if(key == 'd') {
+                        moveRight(field, nextShapes, score);
+                        decrementNextX();                       // decrements so still able to move left
+                    } else if (key == 'a') {
+                        moveLeft(field, nextShapes, score);
+                        incrementNextX();                       // increments so still able to move right
+                    } else if (key == 's') {
+                        moveDown();
+                    } else if (key == ' ') {
+                        moveAllDown();
+                    } else if (key == 'r') {
+                        rotate(gridShape, field, nextShapes, score);
+                        break;
+                    }
+
+                    if(gridMap[xThree][nextyThree] == 0 &&              // have to DOUBLE check due to moving left and right
+                    gridMap[xFour][nextyFour] == 0 &&
+                    nextyFour != (FIELDSIZE - 1)) {
+
+                        makeZero();                             // makes current space of shape all 0's
+
+                        incrementY();                           // increments current space of shape to appear to move down
+
+                        insertNum(gridShape);                   // puts shape into grid after moving down
+
+                        incrementNextY();                       // have to check next space as to not go out of bounds
+
+                        printField(field);                      // reprints everything out appearing to move down one space
+                        printNextShapes(nextShapes);
+                        printScore(score);
+                        // sleep(1);
+                        // usleep(300000);
+                    }
+
+                }
             }
 
-            gridMap[xOne][yOne] = 0;                    // makes current space of shape all 0's
-            gridMap[xTwo][yTwo] = 0;
-            gridMap[xThree][yThree] = 0;
-            gridMap[xFour][yFour] = 0;
+            if(gridMap[xOne][nextyOne] == 0 &&              // have to DOUBLE check due to rotation
+            gridMap[xThree][nextyThree] == 0 &&
+            gridMap[xFour][nextyFour] == 0 &&
+            nextyOne != (FIELDSIZE - 1) &&
+            nextyThree != (FIELDSIZE - 1) &&
+            nextyFour != (FIELDSIZE - 1)) {
 
-            yOne++;                                     // increments current space of shape to appear to move down
-            yTwo++;
-            yThree++;
-            yFour++;
+                makeZero();                                 // makes current space of shape all 0's
 
-            insertNum(gridShape);                        // puts shape into grid after moving down
+                incrementY();                               // increments current space of shape to appear to move down
 
-            nextyOne = yOne + 1;                        // have to check next space as to not go out of bounds
-            nextyThree = yThree + 1;
-            nextyFour = yFour + 1;
+                insertNum(gridShape);                       // puts shape into grid after moving down
 
-            printField(field);                          // reprints everything out appearing to move down one space
-            printNextShapes(nextShapes);
-            printScore(score);
-            sleep(1);
+                incrementNextY();                           // have to check next space as to not go out of bounds
+
+                printField(field);                          // reprints everything out appearing to move down one space
+                printNextShapes(nextShapes);
+                printScore(score);
+                // sleep(1);
+                // usleep(300000);
+            }
 
         }
     } else {                                            // Line check
@@ -278,18 +393,20 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
             gridMap[xTwo][nextyTwo] == 0 &&
             gridMap[xThree][nextyThree] == 0 &&
             gridMap[xFour][nextyFour] == 0 &&
-            nextyOne != (FIELDSIZEY - 1) &&
-            nextyTwo != (FIELDSIZEY - 1) &&
-            nextyThree != (FIELDSIZEY - 1) &&
-            nextyFour != (FIELDSIZEY - 1)) {
+            nextyOne != (FIELDSIZE - 1) &&
+            nextyTwo != (FIELDSIZE - 1) &&
+            nextyThree != (FIELDSIZE - 1) &&
+            nextyFour != (FIELDSIZE - 1)) {
 
             halfdelay(1);                               // continues if no input is given
             key = getch();                              // gets user input
 
             if(key == 'd') {
                 moveRight(field, nextShapes, score);
+                decrementNextX();                       // decrements so still able to move left
             } else if (key == 'a') {
                 moveLeft(field, nextShapes, score);
+                incrementNextX();                       // increments so still able to move right
             } else if (key == 's') {
                 moveDown();
             } else if (key == ' ') {
@@ -298,15 +415,17 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
                 rotate(gridShape, field, nextShapes, score);
                     while((gridMap[xOne][nextyOne] == 0 ||
                         gridMap[xFour][nextyFour] == 0) &&
-                        nextyOne != (FIELDSIZEY - 1) &&
-                        nextyFour != (FIELDSIZEY - 1)){ // &&
-                        halfdelay(1);                               // continues if no input is given
-                        key = getch();                              // gets users input
+                        nextyOne != (FIELDSIZE - 1) &&
+                        nextyFour != (FIELDSIZE - 1)){ // &&
+                        halfdelay(1);                           // continues if no input is given
+                        key = getch();                          // gets users input
 
                         if(key == 'd') {
                             moveRight(field, nextShapes, score);
+                            decrementNextX();                   // decrements so still able to move left
                         } else if (key == 'a') {
                             moveLeft(field, nextShapes, score);
+                            incrementNextX();                   // increments so still able to move right
                         } else if (key == 's') {
                             moveDown();
                         } else if (key == ' ') {
@@ -316,60 +435,50 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
                             break;
                         }
 
-                            gridMap[xOne][yOne] = 0;                    // makes current space of shape all 0's
-                            gridMap[xTwo][yTwo] = 0;
-                            gridMap[xThree][yThree] = 0;
-                            gridMap[xFour][yFour] = 0;
+                        if((gridMap[xOne][nextyOne] == 0 ||         // have to DOUBLE check due to moving left and right
+                            gridMap[xFour][nextyFour] == 0) &&
+                            nextyOne != (FIELDSIZE - 1) &&
+                            nextyFour != (FIELDSIZE - 1)) {
 
-                            yOne++;                                     // increments current space of shape to appear to move down
-                            yTwo++;
-                            yThree++;
-                            yFour++;
+                            makeZero();                             // makes current space of shape all 0's
 
-                            insertNum(gridShape);                        // puts shape into grid after moving down
+                            incrementY();                           // increments current space of shape to appear to move down
 
-                            nextyOne = yOne + 1;
-                            nextyTwo = yTwo + 1;
-                            nextyThree = yThree + 1;
-                            nextyFour = yFour + 1;                      // have to check next space as to not go out of bounds
+                            insertNum(gridShape);                   // puts shape into grid after moving down
 
-                            printField(field);                          // reprints everything out appearing to move down one space
+                            incrementNextY();                       // have to check next space as to not go out of bounds
+
+                            printField(field);                      // reprints everything out appearing to move down one space
                             printNextShapes(nextShapes);
                             printScore(score);
-                            sleep(1);
+                            // sleep(1);
+                            // usleep(300000);
+                        }
                     }
                 }
 
-            if(gridMap[xOne][nextyOne] == 0 &&              // have to DOUBLE check due to rotation
+            if(gridMap[xOne][nextyOne] == 0 &&          // have to DOUBLE check due to rotation
                 gridMap[xTwo][nextyTwo] == 0 &&
                 gridMap[xThree][nextyThree] == 0 &&
                 gridMap[xFour][nextyFour] == 0 &&
-                nextyOne != (FIELDSIZEY - 1) &&
-                nextyTwo != (FIELDSIZEY - 1) &&
-                nextyThree != (FIELDSIZEY - 1) &&
-                nextyFour != (FIELDSIZEY - 1)) {
+                nextyOne != (FIELDSIZE - 1) &&
+                nextyTwo != (FIELDSIZE - 1) &&
+                nextyThree != (FIELDSIZE - 1) &&
+                nextyFour != (FIELDSIZE - 1)) {
 
-                gridMap[xOne][yOne] = 0;                    // makes current space of shape all 0's
-                gridMap[xTwo][yTwo] = 0;
-                gridMap[xThree][yThree] = 0;
-                gridMap[xFour][yFour] = 0;
+                makeZero();                             // makes current space of shape all 0's
 
-                yOne++;                                     // increments current space of shape to appear to move down
-                yTwo++;
-                yThree++;
-                yFour++;
+                incrementY();                           // increments current space of shape to appear to move down
 
-                insertNum(gridShape);                        // puts shape into grid after moving down
+                insertNum(gridShape);                   // puts shape into grid after moving down
 
-                nextyOne = yOne + 1;                        // have to check next space as to not go out of bounds
-                nextyTwo = yTwo + 1;
-                nextyThree = yThree + 1;
-                nextyFour = yFour + 1;
+                incrementNextY();                       // have to check next space as to not go out of bounds
 
-                printField(field);                          // reprints everything out appearing to move down one space
+                printField(field);                      // reprints everything out appearing to move down one space
                 printNextShapes(nextShapes);
                 printScore(score);
-                sleep(1);
+                // sleep(1);
+                // usleep(300000);
                 }
 
         }
@@ -385,105 +494,229 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
 
 void Grid::moveRight(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
 {
-        if(yOne == yTwo && yTwo == yThree && yThree == yFour &&     // Line check
-            gridMap[nextxFour][yFour] == 0 &&
-            nextxFour != (FIELDSIZEX - 1)) {
+    incrementNextX();                                   // increments so able to move right properly
 
-            gridMap[xOne][yOne] = 0;                        // makes current space of shape all 0's
-            gridMap[xTwo][yTwo] = 0;
-            gridMap[xThree][yThree] = 0;
-            gridMap[xFour][yFour] = 0;
+    if(yOne == yTwo && yTwo == yThree && yThree == yFour &&     // Line check
+    gridMap[nextxFour][yFour] == 0 &&
+    nextxFour != (FIELDSIZE - 1)) {
 
-            xOne++;                                         // increments current space of shape to appear to move right
-            xTwo++;
-            xThree++;
-            xFour++;
+    makeZero();                                         // makes current space of shape all 0's
 
-            insertNum(gridShape);                        // puts shape into grid after moving right
+    incrementX();                                       // increments current space of shape to appear to move right
 
-            nextxFour = xFour + 1;                          // have to check next space as to not go out of bounds
+    insertNum(gridShape);                               // puts shape into grid after moving right
 
-            printField(field);                              // reprints everything out appearing to move right one space
-            printNextShapes(nextShapes);
-            printScore(score);
-            sleep(1);
+    incrementNextX();                                   // have to check next space as to not go out of bounds
 
-        } else if(yTwo == yThree && yThree == yFour &&      // Mirrored L, L, T shape check
-            gridMap[nextxOne][yOne] == 0 &&
-            gridMap[nextxFour][yFour] == 0 &&
-            nextxOne != (FIELDSIZEX - 1) &&
-            nextxFour != (FIELDSIZEX - 1)) {
+    printField(field);                                  // reprints everything out appearing to move right one space
+    printNextShapes(nextShapes);
+    printScore(score);
+    // sleep(1);
+    // usleep(300000);
 
-            gridMap[xOne][yOne] = 0;                        // makes current space of shape all 0's
-            gridMap[xTwo][yTwo] = 0;
-            gridMap[xThree][yThree] = 0;
-            gridMap[xFour][yFour] = 0;
+    } else if(yTwo == yThree && yThree == yFour &&      // Mirrored L, L, T shape check
+        gridMap[nextxOne][yOne] == 0 &&
+        gridMap[nextxFour][yFour] == 0 &&
+        nextxOne != (FIELDSIZE - 1) &&
+        nextxFour != (FIELDSIZE - 1)) {
 
-            xOne++;                                         // increments current space of shape to appear to move right
-            xTwo++;
-            xThree++;
-            xFour++;
+        makeZero();                                     // makes current space of shape all 0's
 
-            insertNum(gridShape);                        // puts shape into grid after moving right
+        incrementX();                                   // increments current space of shape to appear to move right
 
-            nextxOne = xOne + 1;                            // have to check next space as to not go out of bounds
-            nextxFour = xFour + 1;
+        insertNum(gridShape);                           // puts shape into grid after moving right
 
-            printField(field);                              // reprints everything out appearing to move right one space
-            printNextShapes(nextShapes);
-            printScore(score);
-            sleep(1);
+        incrementNextX();                               // have to check next space as to not go out of bounds
 
-        } else if(yOne == yTwo && yThree == yFour &&        // Cube, S, Z shape check
-            gridMap[nextxTwo][yTwo] == 0 &&
-            gridMap[nextxFour][yFour] == 0 &&
-            nextxTwo != (FIELDSIZEX - 1) &&
-            nextxFour != (FIELDSIZEX - 1)) {
+        printField(field);                              // reprints everything out appearing to move right one space
+        printNextShapes(nextShapes);
+        printScore(score);
+        // sleep(1);
+        // usleep(300000);
 
-            gridMap[xOne][yOne] = 0;                        // makes current space of shape all 0's
-            gridMap[xTwo][yTwo] = 0;
-            gridMap[xThree][yThree] = 0;
-            gridMap[xFour][yFour] = 0;
+    } else if(yOne == yTwo && yThree == yFour &&        // Cube, S, Z shape check
+        gridMap[nextxTwo][yTwo] == 0 &&
+        gridMap[nextxFour][yFour] == 0 &&
+        nextxTwo != (FIELDSIZE - 1) &&
+        nextxFour != (FIELDSIZE - 1)) {
 
-            xOne++;                                         // increments current space of shape to appear to move right
-            xTwo++;
-            xThree++;
-            xFour++;
+        makeZero();                                     // makes current space of shape all 0's
 
-            insertNum(gridShape);                           // puts shape into grid after moving right
+        incrementX();                                   // increments current space of shape to appear to move right
 
-            nextxTwo = xTwo + 1;                            // have to check next space as to not go out of bounds
-            nextxFour = xFour + 1;
+        insertNum(gridShape);                           // puts shape into grid after moving right
 
-            printField(field);                              // reprints everything out appearing to move right one space
-            printNextShapes(nextShapes);
-            printScore(score);
-            sleep(1);
+        incrementNextX();                               // have to check next space as to not go out of bounds
 
-        } else if(xOne == xTwo && xTwo == xThree && xThree == xFour &&      // rotation 1 and 2 line check
-            gridMap[nextxOne][yOne] != (FIELDSIZEX -1)) {
+        printField(field);                              // reprints everything out appearing to move right one space
+        printNextShapes(nextShapes);
+        printScore(score);
+        // sleep(1);
+        // usleep(300000);
 
-            gridMap[xOne][yOne] = 0;                        // makes current space of shape all 0's
-            gridMap[xTwo][yTwo] = 0;
-            gridMap[xThree][yThree] = 0;
-            gridMap[xFour][yFour] = 0;
+    } else if(xOne == xTwo && xTwo == xThree && xThree == xFour &&      // rotation 1 and 2 line check
+        gridMap[nextxOne][yOne] == 0 &&
+        gridMap[nextxOne][yOne] != (FIELDSIZE - 1)) {
 
-            xOne++;                                         // increments current space of shape to appear to move right
-            xTwo++;
-            xThree++;
-            xFour++;
+        makeZero();                                     // makes current space of shape all 0's
 
-            insertNum(gridShape);                           // puts shape into grid after moving right
+        incrementX();                                   // increments current space of shape to appear to move right
 
-            nextxOne = xOne + 1;                            // have to check next space as to not go out of bounds
+        insertNum(gridShape);                           // puts shape into grid after moving right
 
-            printField(field);                              // reprints everything out appearing to move right one space
-            printNextShapes(nextShapes);
-            printScore(score);
-            sleep(1);
+        incrementNextX();                               // have to check next space as to not go out of bounds
 
-        }
+        printField(field);                              // reprints everything out appearing to move right one space
+        printNextShapes(nextShapes);
+        printScore(score);
+        // sleep(1);
+        // usleep(300000);
 
+    } else if(xOne == xTwo && xTwo == xFour &&                          // rotation 1 T check
+        gridMap[nextxOne][xOne] == 0 &&
+        gridMap[nextxThree][yThree] == 0 &&
+        gridMap[nextxFour][yFour] == 0 &&
+        gridMap[nextxThree][yThree] != (FIELDSIZE - 1)) {
+
+        makeZero();                                     // makes current space of shape all 0's
+
+        incrementX();                                   // increments current space of shape to appear to move right
+
+        insertNum(gridShape);                           // puts shape into grid after moving right
+
+        incrementNextX();                               // have to check next space as to not go out of bounds
+
+        printField(field);                              // reprints everything out appearing to move right one space
+        printNextShapes(nextShapes);
+        printScore(score);
+        //sleep(1);
+        // usleep(300000);
+
+    } else if(yOne == yTwo && yTwo == yThree &&                         // rotation 2 T check
+        gridMap[nextxThree][yThree] == 0 &&
+        gridMap[nextxFour][yFour] == 0 &&
+        gridMap[nextxThree][yThree] != (FIELDSIZE - 1)) {
+        makeZero();                                     // makes current space of shape all 0's
+
+        incrementX();                                   // increments current space of shape to appear to move right
+
+        insertNum(gridShape);                           // puts shape into grid after moving right
+
+        incrementNextX();                               // have to check next space as to not go out of bounds
+
+        printField(field);                              // reprints everything out appearing to move right one space
+        printNextShapes(nextShapes);
+        printScore(score);
+        //sleep(1);
+        // usleep(300000);
+    } else if(xOne == xThree && xThree == xFour &&                          // rotation 3 T check
+        gridMap[nextxOne][xOne] == 0 &&
+        gridMap[nextxThree][yThree] == 0 &&
+        gridMap[nextxFour][yFour] == 0 &&
+        gridMap[nextxOne][yOne] != (FIELDSIZE - 1) &&
+        gridMap[nextxThree][yThree] != (FIELDSIZE - 1) &&
+        gridMap[nextxFour][yFour] != (FIELDSIZE - 1)) {
+
+        makeZero();                                     // makes current space of shape all 0's
+
+        incrementX();                                   // increments current space of shape to appear to move right
+
+        insertNum(gridShape);                           // puts shape into grid after moving right
+
+        incrementNextX();                               // have to check next space as to not go out of bounds
+
+        printField(field);                              // reprints everything out appearing to move right one space
+        printNextShapes(nextShapes);
+        printScore(score);
+        //sleep(1);
+        // usleep(300000);
+
+    } else if(xOne == xTwo && xThree == xFour &&       // rotation 1 and 3 S check                   // rotation 3 T check
+        gridMap[nextxOne][xOne] == 0 &&
+        gridMap[nextxThree][yThree] == 0 &&
+        gridMap[nextxFour][yFour] == 0 &&
+        gridMap[nextxThree][yThree] != (FIELDSIZE - 1) &&
+        gridMap[nextxFour][yFour] != (FIELDSIZE - 1)) {
+
+        makeZero();                                     // makes current space of shape all 0's
+
+        incrementX();                                   // increments current space of shape to appear to move right
+
+        insertNum(gridShape);                           // puts shape into grid after moving right
+
+        incrementNextX();                               // have to check next space as to not go out of bounds
+
+        printField(field);                              // reprints everything out appearing to move right one space
+        printNextShapes(nextShapes);
+        printScore(score);
+        //sleep(1);
+        // usleep(300000);
+
+    } else if(xOne == xThree && xTwo == xFour &&       // rotation 1 and 3 Z check
+        gridMap[nextxOne][xOne] == 0 &&
+        gridMap[nextxThree][yThree] == 0 &&
+        gridMap[nextxOne][yOne] != (FIELDSIZE - 1) &&
+        gridMap[nextxThree][yThree] != (FIELDSIZE - 1)) {
+
+        makeZero();                                     // makes current space of shape all 0's
+
+        incrementX();                                   // increments current space of shape to appear to move right
+
+        insertNum(gridShape);                           // puts shape into grid after moving right
+
+        incrementNextX();                               // have to check next space as to not go out of bounds
+
+        printField(field);                              // reprints everything out appearing to move right one space
+        printNextShapes(nextShapes);
+        printScore(score);
+        //sleep(1);
+        // usleep(300000);
+
+    } else if(xOne == xTwo && xTwo == xFour &&          // rotation 3 L check
+        gridMap[nextxOne][xOne] == 0 &&
+        gridMap[nextxTwo][yTwo] == 0 &&
+        gridMap[nextxFour][yFour] == 0 &&
+        nextxOne != (FIELDSIZE - 1) &&
+        nextxTwo != (FIELDSIZE - 1) &&
+        nextxFour != (FIELDSIZE - 1)) {
+
+        makeZero();                                     // makes current space of shape all 0's
+
+        incrementX();                                   // increments current space of shape to appear to move right
+
+        insertNum(gridShape);                           // puts shape into grid after moving right
+
+        incrementNextX();                               // have to check next space as to not go out of bounds
+
+        printField(field);                              // reprints everything out appearing to move right one space
+        printNextShapes(nextShapes);
+        printScore(score);
+        //sleep(1);
+        // usleep(300000);
+
+    } else if(xOne == xTwo && xTwo == xThree &&          // rotation 3 L check
+        gridMap[nextxOne][xOne] == 0 &&
+        gridMap[nextxTwo][yTwo] == 0 &&
+        gridMap[nextxFour][yFour] == 0 &&
+        nextxOne != (FIELDSIZE - 1) &&
+        nextxTwo != (FIELDSIZE - 1) &&
+        nextxFour != (FIELDSIZE - 1)) {
+
+        makeZero();                                     // makes current space of shape all 0's
+
+        incrementX();                                   // increments current space of shape to appear to move right
+
+        insertNum(gridShape);                           // puts shape into grid after moving right
+
+        incrementNextX();                               // have to check next space as to not go out of bounds
+
+        printField(field);                              // reprints everything out appearing to move right one space
+        printNextShapes(nextShapes);
+        printScore(score);
+        //sleep(1);
+        // usleep(300000);
+
+    }
 
     printField(field);                                  // reprints everything out if the shape can't move right
     printNextShapes(nextShapes);
@@ -493,28 +726,25 @@ void Grid::moveRight(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
 
 void Grid::moveLeft(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
 {
-    if(yOne == yTwo && yTwo == yThree && yThree == yFour &&     // Line check
+    decrementNextX();                                   // decrements so able to move left properly
+
+     if(yOne == yTwo && yTwo == yThree && yThree == yFour &&     // Line check
         gridMap[nextxOne][yOne] == 0 &&
         nextxOne != 0){
 
-    gridMap[xOne][yOne] = 0;                            // makes current space of shape all 0's
-        gridMap[xTwo][yTwo] = 0;
-        gridMap[xThree][yThree] = 0;
-        gridMap[xFour][yFour] = 0;
+        makeZero();                                     // makes current space of shape all 0's
 
-        xOne--;                                         // decrements current space of shape to appear to move left
-        xTwo--;
-        xThree--;
-        xFour--;
+        decrementX();                                   // decrements current space of shape to appear to move left
 
-        insertNum(gridShape);                        // puts shape into grid after moving left
+        insertNum(gridShape);                           // puts shape into grid after moving left
 
-        nextxOne = xOne - 1;                            // have to check next space as to not go out of bounds
+        decrementNextX();                               // have to check next space as to not go out of bounds
 
         printField(field);                              // reprints everything out appearing to move left one space
         printNextShapes(nextShapes);
         printScore(score);
-        sleep(1);
+        //sleep(1);
+        // usleep(300000);
 
     } else if(yTwo == yThree && yThree == yFour &&      // Mirrored L, L, T shape check
         gridMap[nextxOne][yOne] == 0 &&
@@ -522,25 +752,19 @@ void Grid::moveLeft(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         nextxOne != 0 &&
         nextxTwo != 0){
 
-        gridMap[xOne][yOne] = 0;                        // makes current space of shape all 0's
-        gridMap[xTwo][yTwo] = 0;
-        gridMap[xThree][yThree] = 0;
-        gridMap[xFour][yFour] = 0;
+        makeZero();                                     // makes current space of shape all 0's
 
-        xOne--;                                         // decrements current space of shape to appear to move left
-        xTwo--;
-        xThree--;
-        xFour--;
+        decrementX();                                   // decrements current space of shape to appear to move left
 
-        insertNum(gridShape);                        // puts shape into grid after moving left
+        insertNum(gridShape);                           // puts shape into grid after moving left
 
-        nextxOne = xOne - 1;                            // have to check next space as to not go out of bounds
-        nextxTwo = xTwo - 1;
+        decrementNextX();                               // have to check next space as to not go out of bounds
 
         printField(field);                              // reprints everything out appearing to move left one space
         printNextShapes(nextShapes);
         printScore(score);
-        sleep(1);
+        //sleep(1);
+        // usleep(300000);
 
     } else if(yOne == yTwo && yThree == yFour &&        // Cube, S, Z shape check
         gridMap[nextxOne][yOne] == 0 &&
@@ -548,52 +772,184 @@ void Grid::moveLeft(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         nextxOne != 0 &&
         nextxThree != 0){
 
-        gridMap[xOne][yOne] = 0;                        // makes current space of shape all 0's
-        gridMap[xTwo][yTwo] = 0;
-        gridMap[xThree][yThree] = 0;
-        gridMap[xFour][yFour] = 0;
+        makeZero();                                     // makes current space of shape all 0's
 
-        xOne--;                                         // decrements current space of shape to appear to move left
-        xTwo--;
-        xThree--;
-        xFour--;
+        decrementX();                                   // decrements current space of shape to appear to move left
 
-        insertNum(gridShape);                        // puts shape into grid after moving left
+        insertNum(gridShape);                           // puts shape into grid after moving left
 
-        nextxOne = xOne - 1;                            // have to check next space as to not go out of bounds
-        nextxThree = xThree - 1;
+        decrementNextX();                               // have to check next space as to not go out of bounds
 
         printField(field);                              // reprints everything out appearing to move left one space
         printNextShapes(nextShapes);
         printScore(score);
-        sleep(1);
-
+        //sleep(1);
+        // usleep(300000);
     } else if(xOne == xTwo && xTwo == xThree && xThree == xFour &&      // rotation 1 and 2 line check
             gridMap[nextxOne][yOne] == 0 &&
             nextxOne != 0) {
 
-            gridMap[xOne][yOne] = 0;                        // makes current space of shape all 0's
-            gridMap[xTwo][yTwo] = 0;
-            gridMap[xThree][yThree] = 0;
-            gridMap[xFour][yFour] = 0;
+            makeZero();                                 // makes current space of shape all 0's
 
-            xOne--;                                         // increments current space of shape to appear to move left
-            xTwo--;
-            xThree--;
-            xFour--;
+            decrementX();                               // decrements current space of shape to appear to move left
 
-            insertNum(gridShape);                        // puts shape into grid after moving left
+            insertNum(gridShape);                       // puts shape into grid after moving left
 
-            nextxOne = xOne - 1;                            // have to check next space as to not go out of bounds
+            decrementNextX();                           // have to check next space as to not go out of bounds
 
-            printField(field);                              // reprints everything out appearing to move left one space
+            printField(field);                          // reprints everything out appearing to move left one space
             printNextShapes(nextShapes);
             printScore(score);
-            sleep(1);
+            //sleep(1);
+            // usleep(300000);
 
-        }
+    } else if(yOne == yTwo && yTwo == yThree &&
+        gridMap[nextxOne][yOne] == 0 &&
+        gridMap[nextxFour][yFour] == 0 &&
+        nextxOne != 0) {                                    // rotation 2 T check
 
-    printField(field);                                  // reprints everything out if the shape can't move left
+        makeZero();                                 // makes current space of shape all 0's
+
+        decrementX();                               // decrements current space of shape to appear to move left
+
+        insertNum(gridShape);                       // puts shape into grid after moving left
+
+        decrementNextX();                           // have to check next space as to not go out of bounds
+
+        printField(field);                          // reprints everything out appearing to move left one space
+        printNextShapes(nextShapes);
+        printScore(score);
+        //sleep(1);
+        // usleep(300000);
+
+    } else if(xOne == xThree && xThree == xFour &&                          // rotation 3 T check
+        gridMap[nextxOne][xOne] == 0 &&
+        gridMap[nextxThree][yThree] == 0 &&
+        gridMap[nextxFour][yFour] == 0 &&
+        nextxFour != 0) {
+
+        makeZero();                                 // makes current space of shape all 0's
+
+        decrementX();                               // decrements current space of shape to appear to move left
+
+        insertNum(gridShape);                       // puts shape into grid after moving left
+
+        decrementNextX();                           // have to check next space as to not go out of bounds
+
+        printField(field);                          // reprints everything out appearing to move left one space
+        printNextShapes(nextShapes);
+        printScore(score);
+        //sleep(1);
+        // usleep(300000);
+
+    } else if(xOne == xTwo && xTwo == xFour &&                          // rotation 3 T check
+        gridMap[nextxOne][xOne] == 0 &&
+        gridMap[nextxTwo][yTwo] == 0 &&
+        gridMap[nextxFour][yFour] == 0 &&
+        nextxTwo != 0) {
+
+        makeZero();                                 // makes current space of shape all 0's
+
+        decrementX();                               // decrements current space of shape to appear to move left
+
+        insertNum(gridShape);                       // puts shape into grid after moving left
+
+        decrementNextX();                           // have to check next space as to not go out of bounds
+
+        printField(field);                          // reprints everything out appearing to move left one space
+        printNextShapes(nextShapes);
+        printScore(score);
+        //sleep(1);
+        // usleep(300000);
+
+    } else if(xOne == xTwo && xThree == xFour &&                          // rotation 3 T check
+        gridMap[nextxOne][xOne] == 0 &&
+        gridMap[nextxTwo][yTwo] == 0 &&
+        gridMap[nextxFour][yFour] == 0 &&
+        nextxOne != 0 &&
+        nextxTwo != 0) {
+
+        makeZero();                                 // makes current space of shape all 0's
+
+        decrementX();                               // decrements current space of shape to appear to move left
+
+        insertNum(gridShape);                       // puts shape into grid after moving left
+
+        decrementNextX();                           // have to check next space as to not go out of bounds
+
+        printField(field);                          // reprints everything out appearing to move left one space
+        printNextShapes(nextShapes);
+        printScore(score);
+        //sleep(1);
+        // usleep(300000);
+
+    } else if(xOne == xThree && xTwo == xFour &&                        // rotation 1 and 3 Z check
+        gridMap[nextxOne][xOne] == 0 &&
+        gridMap[nextxFour][yFour] == 0 &&
+        nextxOne != 0 &&
+        nextxFour != 0) {
+
+        makeZero();                                 // makes current space of shape all 0's
+
+        decrementX();                               // decrements current space of shape to appear to move left
+
+        insertNum(gridShape);                       // puts shape into grid after moving left
+
+        decrementNextX();                           // have to check next space as to not go out of bounds
+
+        printField(field);                          // reprints everything out appearing to move left one space
+        printNextShapes(nextShapes);
+        printScore(score);
+        //sleep(1);
+        // usleep(300000);
+
+    } else if(xOne == xTwo && xTwo == xFour &&          // rotation 3 L check
+        gridMap[nextxOne][xOne] == 0 &&
+        gridMap[nextxTwo][yTwo] == 0 &&
+        gridMap[nextxThree][yThree] == 0 &&
+        nextxOne != 0 &&
+        nextxTwo != 0 &&
+        nextxThree != 0) {
+
+        makeZero();                                 // makes current space of shape all 0's
+
+        decrementX();                               // decrements current space of shape to appear to move left
+
+        insertNum(gridShape);                       // puts shape into grid after moving left
+
+        decrementNextX();                           // have to check next space as to not go out of bounds
+
+        printField(field);                          // reprints everything out appearing to move left one space
+        printNextShapes(nextShapes);
+        printScore(score);
+        //sleep(1);
+        // usleep(300000);
+
+    } else if(xOne == xTwo && xTwo == xThree &&          // rotation 3 L check
+        gridMap[nextxOne][xOne] == 0 &&
+        gridMap[nextxTwo][yTwo] == 0 &&
+        gridMap[nextxThree][yThree] == 0 &&
+        nextxOne != 0 &&
+        nextxTwo != 0 &&
+        nextxThree != 0) {
+
+        makeZero();                                 // makes current space of shape all 0's
+
+        decrementX();                               // decrements current space of shape to appear to move left
+
+        insertNum(gridShape);                       // puts shape into grid after moving left
+
+        decrementNextX();                           // have to check next space as to not go out of bounds
+
+        printField(field);                          // reprints everything out appearing to move left one space
+        printNextShapes(nextShapes);
+        printScore(score);
+        //sleep(1);
+        // usleep(300000);
+
+    }
+
+    printField(field);                              // reprints everything out if the shape can't move left
     printNextShapes(nextShapes);
     printScore(score);
 
@@ -601,125 +957,157 @@ void Grid::moveLeft(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
 
 void Grid::moveDown()
 {
-    if(xOne == xThree && xTwo == xFour &&               // Cube check
+
+    if(((xOne == xTwo && xTwo == xFour) || (xOne == xThree && xThree == xFour)) &&
+        ((gridMap[xThree][nextyThree] == 0 &&
+        gridMap[xFour][nextyFour] == 0 &&
+        nextxThree != (FIELDSIZE - 2) &&
+        nextxFour != (FIELDSIZE - 2)) ||
+        (gridMap[nextxThree][yThree] == 0 &&
+        gridMap[nextxFour][yFour] == 0 &&
+        nextxThree != (FIELDSIZE - 2) &&
+        nextxFour != (FIELDSIZE - 2)))) {
+
+        makeZero();                                     // makes current space of shape all 0's
+
+        incrementY();                                   // increments current space of shape to appear to move down twice as fast
+
+        insertNum(gridShape);                           // puts shape into grid after moving down
+
+        incrementNextY();
+
+    } else if(xOne == xThree && xTwo == xFour &&               // Cube check
         gridMap[xThree][nextyThree] == 0 &&
         gridMap[xFour][nextyFour] == 0 &&
-        nextyThree != (FIELDSIZEY - 2) &&
-        nextyFour != (FIELDSIZEY - 2)) {
+        nextyThree != (FIELDSIZE - 2) &&
+        nextyFour != (FIELDSIZE - 2)) {
 
 
-        gridMap[xOne][yOne] = 0;                        // makes current space of shape all 0's
-        gridMap[xTwo][yTwo] = 0;
-        gridMap[xThree][yThree] = 0;
-        gridMap[xFour][yFour] = 0;
+        makeZero();                                     // makes current space of shape all 0's
 
-        yOne++;                                         // increments current space of shape to appear to move down twice as fast
-        yTwo++;
-        yThree++;
-        yFour++;
+        incrementY();                                   // increments current space of shape to appear to move down twice as fast
 
-        insertNum(gridShape);                        // puts shape into grid after moving down
+        insertNum(gridShape);                           // puts shape into grid after moving down
 
-        nextyThree = yThree + 1;                        // have to check next space as to not go out of bounds
-        nextyFour = yFour + 1;
+        incrementNextY();                               // have to check next space as to not go out of bounds
+
+    } else if(xOne == xTwo && xThree == xFour &&               // S shape 1 and 3 rotation check
+        gridMap[xTwo][nextyTwo] == 0 &&
+        gridMap[xFour][nextyFour] == 0 &&
+        nextyFour != (FIELDSIZE - 2)) {
+
+        makeZero();                                     // makes current space of shape all 0's
+
+        incrementY();                                   // increments current space of shape to appear to move down twice as fast
+
+        insertNum(gridShape);                           // puts shape into grid after moving down
+
+        incrementNextY();                               // have to check next space as to not go out of bounds
 
     } else if((xOne == xTwo || xOne == xFour || xOne == xThree) &&  // Mirrored L, L, T, S shape check
             gridMap[xTwo][nextyTwo] == 0 &&
             gridMap[xThree][nextyThree] == 0 &&
             gridMap[xFour][nextyFour] == 0 &&
-            nextyTwo != (FIELDSIZEY - 2) &&
-            nextyThree != (FIELDSIZEY - 2) &&
-            nextyFour != (FIELDSIZEY - 2)) {
+            nextyTwo != (FIELDSIZE - 2) &&
+            nextyThree != (FIELDSIZE - 2) &&
+            nextyFour != (FIELDSIZE - 2)) {
 
-            gridMap[xOne][yOne] = 0;                    // makes current space of shape all 0's
-            gridMap[xTwo][yTwo] = 0;
-            gridMap[xThree][yThree] = 0;
-            gridMap[xFour][yFour] = 0;
+            makeZero();                                 // makes current space of shape all 0's
 
-            yOne++;                                     // increments current space of shape to appear to move down twice as fast
-            yTwo++;
-            yThree++;
-            yFour++;
+            incrementY();                               // increments current space of shape to appear to move down twice as fast
 
-            insertNum(gridShape);                        // puts shape into grid after moving down
+            insertNum(gridShape);                       // puts shape into grid after moving down
 
-            nextyTwo = yTwo + 1;                        // have to check next space as to not go out of bounds
-            nextyThree = yThree + 1;
-            nextyFour = yFour + 1;
+            incrementNextY();                           // have to check next space as to not go out of bounds
 
     } else if(xTwo == xThree &&                         // Z shape check
         gridMap[xOne][nextyOne] == 0 &&
         gridMap[xThree][nextyThree] == 0 &&
         gridMap[xFour][nextyFour] == 0 &&
-        nextyOne != (FIELDSIZEY - 2) &&
-        nextyThree != (FIELDSIZEY - 2) &&
-        nextyFour != (FIELDSIZEY - 2)) {
+        nextyOne != (FIELDSIZE - 2) &&
+        nextyThree != (FIELDSIZE - 2) &&
+        nextyFour != (FIELDSIZE - 2)) {
 
-        gridMap[xOne][yOne] = 0;                        // makes current space of shape all 0's
-        gridMap[xTwo][yTwo] = 0;
-        gridMap[xThree][yThree] = 0;
-        gridMap[xFour][yFour] = 0;
+        makeZero();                                     // makes current space of shape all 0's
 
-        yOne++;                                         // increments current space of shape to appear to move down twice as fast
-        yTwo++;
-        yThree++;
-        yFour++;
 
-        insertNum(gridShape);                        // puts shape into grid after moving down
+        incrementY();                                   // increments current space of shape to appear to move down twice as fast
 
-        nextyOne = yOne + 1;                            // have to check next space as to not go out of bounds
-        nextyThree = yThree + 1;
-        nextyFour = yFour + 1; ;
+        insertNum(gridShape);                           // puts shape into grid after moving down
+
+        incrementNextY();                               // have to check next space as to not go out of bounds
 
     } else if (yOne == yTwo && yTwo == yThree && yThree == yFour &&
         gridMap[xOne][nextyOne] == 0 &&          // Line check
         gridMap[xTwo][nextyTwo] == 0 &&
         gridMap[xThree][nextyThree] == 0 &&
         gridMap[xFour][nextyFour] == 0 &&
-        nextyOne != (FIELDSIZEY - 2) &&
-        nextyTwo != (FIELDSIZEY - 2) &&
-        nextyThree != (FIELDSIZEY - 2) &&
-        nextyFour != (FIELDSIZEY - 2)) {
+        nextyOne != (FIELDSIZE - 2) &&
+        nextyTwo != (FIELDSIZE - 2) &&
+        nextyThree != (FIELDSIZE - 2) &&
+        nextyFour != (FIELDSIZE - 2)) {
 
-        gridMap[xOne][yOne] = 0;                        // makes current space of shape all 0's
-        gridMap[xTwo][yTwo] = 0;
-        gridMap[xThree][yThree] = 0;
-        gridMap[xFour][yFour] = 0;
+        makeZero();                                     // makes current space of shape all 0's
 
-        yOne++;                                         // increments current space of shape to appear to move down twice as fast
-        yTwo++;
-        yThree++;
-        yFour++;
+        incrementY();                                   // increments current space of shape to appear to move down twice as fast
 
-        insertNum(gridShape);                        // puts shape into grid after moving down
+        insertNum(gridShape);                           // puts shape into grid after moving down
 
-        nextyOne = yOne + 1;                            // have to check next space as to not go out of bounds
-        nextyTwo = yTwo + 1;
-        nextyThree = yThree + 1;
-        nextyFour = yFour + 1;
+        incrementNextY();                               // have to check next space as to not go out of bounds
 
     } else if(xOne == xTwo && xTwo == xThree && xThree == xFour &&  // Line check rotation 1 and 3
         (gridMap[xOne][nextyOne] == 0 ||
         gridMap[xFour][nextyFour] == 0) &&
-        nextyOne != (FIELDSIZEY - 2) &&
-        nextyFour != (FIELDSIZEY - 2)) {
+        nextyOne != (FIELDSIZE - 2) &&
+        nextyFour != (FIELDSIZE - 2)) {
 
-        gridMap[xOne][yOne] = 0;                    // makes current space of shape all 0's
-        gridMap[xTwo][yTwo] = 0;
-        gridMap[xThree][yThree] = 0;
-        gridMap[xFour][yFour] = 0;
+        makeZero();                                     // makes current space of shape all 0's
 
-        yOne++;                                     // increments current space of shape to appear to move all the way down
-        yTwo++;
-        yThree++;
-        yFour++;
+        incrementY();                                   // increments current space of shape to appear to move down twice as fast
 
-        insertNum(gridShape);                        // puts shape into grid after moving down
+        insertNum(gridShape);                           // puts shape into grid after moving down
 
-        nextyOne = yOne + 1;                        // have to check next space as to not go out of bounds
-        nextyTwo = yTwo + 1;
-        nextyThree = yThree + 1;
-        nextyFour = yFour + 1;
+        incrementNextY();                               // have to check next space as to not go out of bounds
+
+    } else if(xOne == xTwo && xTwo == xThree &&  // Mirror L check rotation 1
+        (gridMap[xThree][nextyThree] == 0 ||
+        gridMap[xFour][nextyFour] == 0) &&
+        nextyFour != (FIELDSIZE - 2)) {
+
+        makeZero();                                     // makes current space of shape all 0's
+
+        incrementY();                                   // increments current space of shape to appear to move down twice as fast
+
+        insertNum(gridShape);                           // puts shape into grid after moving down
+
+        incrementNextY();                               // have to check next space as to not go out of bounds
+
+    } else if(xTwo == xThree && xThree == xFour &&  // Mirror L check rotation 1
+        (gridMap[xOne][nextyOne] == 0 ||
+        gridMap[xFour][nextyFour] == 0) &&
+        nextyFour != (FIELDSIZE - 2)) {
+
+        makeZero();                                     // makes current space of shape all 0's
+
+        incrementY();                                   // increments current space of shape to appear to move down twice as fast
+
+        insertNum(gridShape);                           // puts shape into grid after moving down
+
+        incrementNextY();                               // have to check next space as to not go out of bounds
+
+    } else if (xThree == xFour &&                       // L rotation 2 check
+        (gridMap[xOne][nextyOne] == 0 &&
+        gridMap[xTwo][nextyTwo] == 0 &&
+        gridMap[xFour][nextyFour] == 0) &&
+        nextyFour != (FIELDSIZE - 2)) {
+
+        makeZero();                                     // makes current space of shape all 0's
+
+        incrementY();                                   // increments current space of shape to appear to move down twice as fast
+
+        insertNum(gridShape);                           // puts shape into grid after moving down
+
+        incrementNextY();
 
     }
 
@@ -733,71 +1121,118 @@ void Grid::moveAllDown()
      if(xOne == xTwo && xTwo == xThree && xThree == xFour) {  // Line check rotation 1 and 3
         while((gridMap[xOne][nextyOne] == 0 ||          // using while loop bc the shape will move all the way down the grid
             gridMap[xFour][nextyFour] == 0) &&
-            nextyOne != (FIELDSIZEY - 1) &&
-            nextyFour != (FIELDSIZEY - 1)) {
+            nextyOne != (FIELDSIZE - 1) &&
+            nextyFour != (FIELDSIZE - 1)) {
 
-            gridMap[xOne][yOne] = 0;                    // makes current space of shape all 0's
-            gridMap[xTwo][yTwo] = 0;
-            gridMap[xThree][yThree] = 0;
-            gridMap[xFour][yFour] = 0;
+            makeZero();                                 // makes current space of shape all 0's
 
-            yOne++;                                     // increments current space of shape to appear to move all the way down
-            yTwo++;
-            yThree++;
-            yFour++;
+            incrementY();                               // increments current space of shape to appear to move all the way down
 
-            insertNum(gridShape);                        // puts shape into grid after moving down
+            insertNum(gridShape);                       // puts shape into grid after moving down
 
-            nextyOne = yOne + 1;                        // have to check next space as to not go out of bounds
-            nextyTwo = yTwo + 1;
-            nextyThree = yThree + 1;
-            nextyFour = yFour + 1;
+            incrementNextY();                           // have to check next space as to not go out of bounds
         }
     } else if(xOne == xThree && xTwo == xFour) {        // Cube check
         while(gridMap[xThree][nextyThree] == 0 &&       // using while loop bc the shape will move all the way down the grid
             gridMap[xFour][nextyFour] == 0 &&
-            nextyThree != (FIELDSIZEY - 1) &&
-            nextyFour != (FIELDSIZEY - 1)) {
+            nextyThree != (FIELDSIZE - 1) &&
+            nextyFour != (FIELDSIZE - 1)) {
 
-            gridMap[xOne][yOne] = 0;                    // makes current space of shape all 0's
-            gridMap[xTwo][yTwo] = 0;
-            gridMap[xThree][yThree] = 0;
-            gridMap[xFour][yFour] = 0;
+            makeZero();                                 // makes current space of shape all 0's
 
-            yOne++;                                     // increments current space of shape to appear to move all the way down
-            yTwo++;
-            yThree++;
-            yFour++;
+            incrementY();                               // increments current space of shape to appear to move all the way down
 
-            insertNum(gridShape);                        // puts shape into grid after moving down
+            insertNum(gridShape);                       // puts shape into grid after moving down
 
-            nextyThree = yThree + 1;                    // have to check next space as to not go out of bounds
-            nextyFour = yFour + 1;
+            incrementNextY();                           // have to check next space as to not go out of bounds
 
         }
+    } else if ((xOne == xTwo && xTwo == xThree) || (xTwo == xThree && xThree == xFour)) {
+        while(((gridMap[xOne][nextyOne] == 0 &&
+            gridMap[xFour][nextyFour] == 0) ||
+            (gridMap[xThree][nextyThree] == 0 &&
+            gridMap[xFour][nextyFour] == 0) ||
+            (gridMap[xTwo][nextyTwo] == 0 &&
+            gridMap[xFour][nextyFour] == 0) ||
+            (gridMap[xOne][nextyOne] == 0 &&
+            gridMap[xThree][nextyThree] == 0)) &&
+            nextyFour != (FIELDSIZE - 1)) {
+
+            makeZero();                                 // makes current space of shape all 0's
+
+            incrementY();                               // increments current space of shape to appear to move all the way down
+
+            insertNum(gridShape);                       // puts shape into grid after moving down
+
+            incrementNextY();
+        }
+    } else if ((xOne == xThree && xThree == xFour) || (xOne == xTwo && xTwo == xFour)) {
+        while(
+            //((gridMap[xTwo][nextyTwo] == 0 &&                    // have to DOUBLE check due to rotation
+            //gridMap[xThree][nextyThree] == 0 &&
+            //gridMap[xFour][nextyFour] == 0) ||
+            //(gridMap[xOne][nextyOne] == 0 &&
+            ((gridMap[xThree][nextyThree] == 0 &&
+            gridMap[xFour][nextyFour] == 0) ||
+            //(gridMap[xOne][nextyOne] == 0 &&
+            (gridMap[xTwo][nextyTwo] == 0 &&
+            gridMap[xFour][nextyFour] == 0)) &&
+            //nextyTwo != (FIELDSIZE - 1) &&
+            nextyThree != (FIELDSIZE - 1) &&
+            nextyFour != (FIELDSIZE - 1)) {
+
+            makeZero();                                 // makes current space of shape all 0's
+
+            incrementY();                               // increments current space of shape to appear to move all the way down
+
+            insertNum(gridShape);                       // puts shape into grid after moving down
+
+            incrementNextY();
+
+        }
+    }  else if (xOne == xTwo && xThree == xFour) {              // S shape 1 and 3 rotation check
+        while(gridMap[xTwo][nextyTwo] == 0 &&
+            gridMap[xFour][nextyFour] == 0 &&
+            nextyFour != (FIELDSIZE - 2)) {
+
+            makeZero();                                 // makes current space of shape all 0's
+
+            incrementY();                               // increments current space of shape to appear to move all the way down
+
+            insertNum(gridShape);                       // puts shape into grid after moving down
+
+            incrementNextY();
+
+            }
+    } else if (xThree == xFour) {
+        while((gridMap[xOne][nextyOne] == 0 &&
+            gridMap[xTwo][nextyTwo] == 0 &&
+            gridMap[xFour][nextyFour] == 0)) {
+
+            makeZero();                                 // makes current space of shape all 0's
+
+            incrementY();                               // increments current space of shape to appear to move all the way down
+
+            insertNum(gridShape);                       // puts shape into grid after moving down
+
+            incrementNextY();
+
+            }
     } else if(xOne == xTwo || xOne == xFour || xOne == xThree) {  // Mirrored L, L, T, S shape check
-        while(gridMap[xTwo][nextyTwo] == 0 &&           // using while loop bc the shape will move all the way down the grid
+        while((gridMap[xTwo][nextyTwo] == 0 &&           // using while loop bc the shape will move all the way down the grid
             gridMap[xThree][nextyThree] == 0 &&
             gridMap[xFour][nextyFour] == 0 &&
-            nextyTwo != (FIELDSIZEY - 1) &&
-            nextyThree != (FIELDSIZEY - 1) &&
-            nextyFour != (FIELDSIZEY - 1)) {
+            nextyTwo != (FIELDSIZE - 1) &&
+            nextyThree != (FIELDSIZE - 1) &&
+            nextyFour != (FIELDSIZE - 1))) {
 
-            gridMap[xOne][yOne] = 0;                    // makes current space of shape all 0's
-            gridMap[xTwo][yTwo] = 0;
-            gridMap[xThree][yThree] = 0;
-            gridMap[xFour][yFour] = 0;
+            makeZero();                                 // makes current space of shape all 0's
 
-            yOne++;                                     // increments current space of shape to appear to move all the way down
-            yTwo++;
-            yThree++;
-            yFour++;
+            incrementY();                               // increments current space of shape to appear to move all the way down
 
-            insertNum(gridShape);                        // puts shape into grid after moving down
+            insertNum(gridShape);                       // puts shape into grid after moving down
 
-            nextyTwo = yTwo + 1;                        // have to check next space as to not go out of bounds
-            nextyThree = yThree + 1;
-            nextyFour = yFour + 1;
+            incrementNextY();                           // have to check next space as to not go out of bounds
 
         }
 
@@ -805,25 +1240,17 @@ void Grid::moveAllDown()
         while(gridMap[xOne][nextyOne] == 0 &&           // using while loop bc the shape will move all the way down the grid
             gridMap[xThree][nextyThree] == 0 &&
             gridMap[xFour][nextyFour] == 0 &&
-            nextyOne != (FIELDSIZEY - 1) &&
-            nextyThree != (FIELDSIZEY - 1) &&
-            nextyFour != (FIELDSIZEY - 1)) {
+            nextyOne != (FIELDSIZE - 1) &&
+            nextyThree != (FIELDSIZE - 1) &&
+            nextyFour != (FIELDSIZE - 1)) {
 
-            gridMap[xOne][yOne] = 0;                    // makes current space of shape all 0's
-            gridMap[xTwo][yTwo] = 0;
-            gridMap[xThree][yThree] = 0;
-            gridMap[xFour][yFour] = 0;
+            makeZero();                                 // makes current space of shape all 0's
 
-            yOne++;                                     // increments current space of shape to appear to move all the way down
-            yTwo++;
-            yThree++;
-            yFour++;
+            incrementY();                               // increments current space of shape to appear to move all the way down
 
-            insertNum(gridShape);                        // puts shape into grid after moving down
+            insertNum(gridShape);                       // puts shape into grid after moving down
 
-            nextyOne = yOne + 1;
-            nextyThree = yThree + 1;
-            nextyFour = yFour + 1;
+            incrementNextY();                           // have to check next space as to not go out of bounds
 
         }
     } else if(yOne == yTwo && yTwo == yThree && yThree == yFour) { // Line check rotation 0 and 4
@@ -831,27 +1258,18 @@ void Grid::moveAllDown()
             gridMap[xTwo][nextyTwo] == 0 &&
             gridMap[xThree][nextyThree] == 0 &&
             gridMap[xFour][nextyFour] == 0 &&
-            nextyOne != (FIELDSIZEY - 1) &&
-            nextyTwo != (FIELDSIZEY - 1) &&
-            nextyThree != (FIELDSIZEY - 1) &&
-            nextyFour != (FIELDSIZEY - 1)) {
+            nextyOne != (FIELDSIZE - 1) &&
+            nextyTwo != (FIELDSIZE - 1) &&
+            nextyThree != (FIELDSIZE - 1) &&
+            nextyFour != (FIELDSIZE - 1)) {
 
-            gridMap[xOne][yOne] = 0;                    // makes current space of shape all 0's
-            gridMap[xTwo][yTwo] = 0;
-            gridMap[xThree][yThree] = 0;
-            gridMap[xFour][yFour] = 0;
+            makeZero();                                 // makes current space of shape all 0's
 
-            yOne++;                                     // increments current space of shape to appear to move all the way down
-            yTwo++;
-            yThree++;
-            yFour++;
+            incrementY();                               // increments current space of shape to appear to move all the way down
 
-            insertNum(gridShape);                        // puts shape into grid after moving down
+            insertNum(gridShape);                       // puts shape into grid after moving down
 
-            nextyOne = yOne + 1;                        // have to check next space as to not go out of bounds
-            nextyTwo = yTwo + 1;
-            nextyThree = yThree + 1;
-            nextyFour = yFour + 1;
+            incrementNextY();                           // have to check next space as to not go out of bounds
 
         }
     }
@@ -866,21 +1284,17 @@ void Grid::moveAllDown()
 }
 
 void Grid::rotate(int gridShape, WINDOW *field, WINDOW *nextShapes, WINDOW *score)
-// might need rotate private data, getRotate(); and setRotate(); in shapes class
 {
-    gridMap[xOne][yOne] = 0;                    // makes current space of shape all 0's
-    gridMap[xTwo][yTwo] = 0;
-    gridMap[xThree][yThree] = 0;
-    gridMap[xFour][yFour] = 0;
+    makeZero();                                         // makes current space of shape all 0's
 
-    if(gridShape == 2) {                                           // this will be the line check
-        if(shapeRotation == 0) {                // position 1 to position 2
-        nextxOne += 2;
-        nextxTwo++;
-        nextxFour--;
-        nextyOne--;
-        nextyThree++;
-        nextyFour += 2;
+    if(gridShape == 2) {
+        if(shapeRotation == 0) {                        // position 0 to position 1
+            nextxOne += 2;
+            nextxTwo++;
+            nextxFour--;
+            nextyOne--;
+            nextyThree++;
+            nextyFour += 2;
 
             if(gridMap[nextxOne][nextyOne] == 0 &&
                 gridMap[nextxTwo][nextyTwo] == 0 &&
@@ -900,7 +1314,7 @@ void Grid::rotate(int gridShape, WINDOW *field, WINDOW *nextShapes, WINDOW *scor
                 nextyThree--;
                 nextyFour -= 2;
             }
-        } else if(shapeRotation == 1) {      // position 2 to position 3
+        } else if(shapeRotation == 1) {                 // position 1 to position 2
             nextxOne -= 2;
             nextxTwo--;
             nextxFour++;
@@ -926,7 +1340,7 @@ void Grid::rotate(int gridShape, WINDOW *field, WINDOW *nextShapes, WINDOW *scor
                 nextyTwo--;
                 nextyFour++;
             }
-        } else if(shapeRotation == 2) {     // position 3 to position 4
+        } else if(shapeRotation == 2) {                 // position 2 to position 3
             nextxOne++;
             nextxThree--;
             nextxFour -= 2;
@@ -952,7 +1366,7 @@ void Grid::rotate(int gridShape, WINDOW *field, WINDOW *nextShapes, WINDOW *scor
                 nextyTwo++;
                 nextyFour--;
             }
-        } else if(shapeRotation == 3) {             //position 4 to position 1
+        } else if(shapeRotation == 3) {                 // position 3 to position 0
             nextxOne--;
             nextxThree++;
             nextxFour += 2;
@@ -980,6 +1394,437 @@ void Grid::rotate(int gridShape, WINDOW *field, WINDOW *nextShapes, WINDOW *scor
             }
         }
 
+    } else if(gridShape == 3) {
+        if(shapeRotation == 0) {                        // position 0 to position 1
+        nextxTwo++;
+        nextxThree++;
+        nextxFour--;
+        nextyFour++;
+
+            if(gridMap[nextxFour][nextyFour] == 0) {
+                xTwo++;
+                xThree++;
+                xFour--;
+                yFour++;
+                shapeRotation++;
+            } else {
+                nextxTwo--;
+                nextxThree--;
+                nextxFour++;
+                nextyFour--;
+            }
+        } else if(shapeRotation == 1) {                 // position 1 to position 2
+            nextxOne--;
+            nextyOne++;
+
+            if(gridMap[nextxOne][nextyOne] == 0) {
+                xOne--;
+                yOne++;
+                shapeRotation++;
+            } else {
+                nextxOne++;
+                nextyOne--;
+            }
+        } else if(shapeRotation == 2) {                 // position 2 to position 3
+            nextxOne++;
+            nextxTwo--;
+            nextxThree--;
+            nextyOne--;
+
+            if(gridMap[nextxOne][nextyOne] == 0) {
+                xOne++;
+                xTwo--;
+                xThree--;
+                yOne--;
+                shapeRotation++;
+            } else {
+                nextxOne--;
+                nextxTwo++;
+                nextxThree++;
+                nextyOne++;
+            }
+        } else if(shapeRotation == 3) {                 //position 3 to position 0
+            nextxFour++;
+            nextyFour--;
+
+            if(gridMap[nextxFour][nextyFour] == 0) {
+                xFour++;
+                yFour--;
+                shapeRotation = 0;
+            } else {
+                nextxFour--;
+                nextyFour++;
+            }
+        }
+
+    } else if(gridShape == 4) {
+        if(shapeRotation == 0) {                         // position 0 to position 1
+            nextxTwo--;
+            nextxThree += 2;
+            nextxFour++;
+            nextyTwo++;
+            nextyFour++;
+
+            if(gridMap[nextxThree][yThree] == 0 &&
+                gridMap[nextxFour][nextyFour] == 0) {
+                xTwo--;
+                xThree += 2;
+                xFour++;
+                yTwo++;
+                yFour++;
+                shapeRotation++;
+            } else {
+                nextxTwo++;
+                nextxThree -= 2;
+                nextxFour--;
+                nextyTwo--;
+                nextyFour--;
+            }
+        } else if(shapeRotation == 1) {                 // position 1 to position 2
+            nextxTwo++;
+            nextxThree -= 2;
+            nextxFour--;
+            nextyOne++;
+            nextyThree++;
+
+            if(gridMap[nextxThree][nextyThree] == 0 &&
+                gridMap[nextxFour][yFour] == 0) {
+                xTwo++;
+                xThree -= 2;
+                xFour--;
+                yOne++;
+                yThree++;
+                shapeRotation++;
+            } else {
+                nextxTwo--;
+                nextxThree += 2;
+                nextxFour++;
+                nextyOne--;
+                nextyThree--;
+            }
+        } else if(shapeRotation == 2) {                 // position 2 to position 3
+            nextxOne--;
+            nextxTwo -= 2;
+            nextxThree++;
+            nextyOne--;
+            nextyThree--;
+
+            if(gridMap[nextxOne][nextyOne] == 0) {// &&
+                //gridMap[nextxTwo][yTwo] == 0) {
+                xOne--;
+                xTwo -= 2;
+                xThree++;
+                yOne--;
+                yThree--;
+                shapeRotation++;
+            } else {
+                nextxOne++;
+                nextxTwo += 2;
+                nextxThree--;
+                nextyOne++;
+                nextyThree++;
+            }
+        } else if(shapeRotation == 3) {                 // position 3 to position 0
+            nextxOne++;
+            nextxTwo += 2;
+            nextxThree++;
+            nextyTwo--;
+            nextyFour--;
+
+            if(gridMap[nextxOne][yOne] == 0 &&
+                gridMap[nextxTwo][nextyTwo] == 0) {
+                xOne++;
+                xTwo += 2;
+                xThree++;
+                yTwo--;
+                yFour--;
+                shapeRotation = 0;
+            } else {
+                nextxOne++;
+                nextxTwo += 2;
+                nextxThree++;
+                nextyTwo--;
+                nextyFour--;
+            }
+        }
+    } else if(gridShape == 5) {
+        if(shapeRotation == 0) {                         // position 0 to position 1
+            nextxOne += 2;
+            nextxThree++;
+            nextxFour--;
+            nextyTwo++;
+            nextyFour++;
+
+            if(gridMap[nextxOne][yOne] == 0 &&
+                gridMap[nextxFour][nextyFour] == 0) {
+                xOne += 2;
+                xThree++;
+                xFour--;
+                yTwo++;
+                yFour++;
+                shapeRotation++;
+            } else {
+                nextxOne -= 2;
+                nextxThree--;
+                nextxFour++;
+                nextyTwo--;
+                nextyFour--;
+            }
+        } else if(shapeRotation == 1) {                 // position 1 to position 2
+            nextxOne -= 2;
+            nextxThree--;
+            nextxFour++;
+            nextyOne++;
+            nextyThree++;
+
+            if(gridMap[nextxOne][nextyOne] == 0 &&
+                gridMap[nextxThree][nextyThree] == 0) {
+                xOne -= 2;
+                xThree--;
+                xFour++;
+                yOne++;
+                yThree++;
+                shapeRotation++;
+            } else {
+                nextxOne += 2;
+                nextxThree++;
+                nextxFour--;
+                nextyOne--;
+                nextyThree--;
+            }
+        } else if(shapeRotation == 2) {                 // position 2 to position 3
+            nextxOne++;
+            nextxTwo--;
+            nextxFour -= 2;
+            nextyOne--;
+            nextyThree--;
+
+            if(gridMap[nextxOne][nextyOne] == 0) {//} &&
+                //gridMap[nextxFour][yFour] == 0) {
+                xOne++;
+                xTwo--;
+                xFour -= 2;
+                yOne--;
+                yThree--;
+                shapeRotation++;
+            } else {
+                nextxOne--;
+                nextxTwo++;
+                nextxFour += 2;
+                nextyOne++;
+                nextyThree++;
+            }
+        } else if(shapeRotation == 3) {                 // position 3 to position 0
+            nextxOne--;
+            nextxTwo++;
+            nextxFour += 2;
+            nextyTwo--;
+            nextyFour--;
+
+            if(gridMap[nextxOne][yOne] == 0 &&
+                gridMap[nextxFour][nextyFour] == 0) {
+                nextxOne--;
+                nextxTwo++;
+                nextxFour += 2;
+                nextyTwo--;
+                nextyFour--;
+                shapeRotation = 0;;
+            } else {
+                nextxOne++;
+                nextxTwo--;
+                nextxFour -= 2;
+                nextyTwo++;
+                nextyFour++;
+            }
+        }
+    } else if(gridShape == 6) {
+        if(shapeRotation == 0) {                         // position 0 to position 1
+            nextxOne++;
+            nextxTwo += 2;
+            nextxFour--;
+            nextyTwo--;
+            nextyFour++;
+
+            if(gridMap[nextxOne][yOne] == 0 &&
+                gridMap[nextxTwo][nextyTwo] == 0 &&
+                gridMap[nextxFour][nextyFour] == 0) {
+                xOne++;
+                xTwo += 2;
+                xFour--;
+                yTwo--;
+                yFour++;
+                shapeRotation++;
+            } else {
+                nextxOne--;
+                nextxTwo -= 2;
+                nextxFour++;
+                nextyTwo++;
+                nextyFour--;
+            }
+        } else if(shapeRotation == 1) {                 // position 1 to position 2
+            nextxOne--;
+            nextxTwo--;
+            nextxThree++;
+            nextxFour++;
+            nextyOne++;
+            nextyTwo++;
+
+            if(gridMap[nextxOne][nextyOne] == 0 &&
+                gridMap[nextxThree][yThree] == 0 &&
+                gridMap[nextxFour][yFour] == 0) {
+                xOne--;
+                xTwo--;
+                xThree++;
+                xFour++;
+                yOne++;
+                yTwo++;
+                shapeRotation++;
+            } else {
+                nextxOne++;
+                nextxTwo++;
+                nextxThree--;
+                nextxFour--;
+                nextyOne--;
+                nextyTwo--;
+            }
+        } else if(shapeRotation == 2) {                 // position 2 to position 3
+            nextxOne++;
+            nextxThree -= 2;
+            nextxFour--;
+            nextyOne--;
+            nextyThree++;
+
+            if(gridMap[nextxOne][nextyOne] == 0 &&
+                gridMap[nextxThree][nextyThree] == 0 &&
+                gridMap[nextxFour][yFour] == 0) {
+                xOne++;
+                xThree -= 2;
+                xFour--;
+                yOne--;
+                yThree++;
+                shapeRotation++;
+            } else {
+                nextxOne--;
+                nextyThree += 2;
+                nextxFour++;
+                nextyOne++;
+                nextyThree--;
+            }
+        } else if(shapeRotation == 3) {                 // position 3 to position 0
+            nextxOne--;
+            nextxTwo--;
+            nextxThree++;
+            nextxFour++;
+            nextyThree--;
+            nextyFour--;
+
+            if(gridMap[nextxOne][yOne] == 0 &&
+                gridMap[nextxTwo][yTwo] == 0 &&
+                gridMap[nextxFour][nextyFour] == 0) {
+                xOne--;
+                xTwo--;
+                xThree++;
+                xFour++;
+                yThree--;
+                yFour--;
+                shapeRotation = 0;
+            } else {
+                nextxOne++;
+                nextxTwo++;
+                nextxThree++;
+                nextxFour--;
+                nextyThree++;
+                nextyFour++;
+            }
+        }
+    } else if(gridShape == 7) {
+        if(shapeRotation == 0) {                         // position 0 to position 1
+            nextxOne--;
+            nextxTwo++;
+            nextyThree++;
+            nextyFour++;
+
+            if(gridMap[nextxOne][yOne] == 0 &&
+                gridMap[xThree][nextyThree] == 0 &&
+                gridMap[xFour][nextyFour] == 0) {
+                xOne--;
+                xTwo++;
+                yThree++;
+                yFour++;
+                shapeRotation++;
+            } else {
+                nextxOne++;
+                nextxTwo--;
+                nextyThree--;
+                nextyFour--;
+            }
+        } else if(shapeRotation == 1) {                 // position 1 to position 2
+            nextxOne--;
+            nextxThree++;
+            nextxFour -= 2;
+            nextyOne++;
+            nextyThree--;
+
+            if(//gridMap[nextxOne][nextyOne] == 0) {//} &&
+                gridMap[nextxThree][nextyThree] == 0) {//} &&
+                //gridMap[nextxFour][yFour] == 0) {
+                xOne--;
+                xThree++;
+                xFour -= 2;
+                yOne++;
+                yThree--;
+                shapeRotation++;
+            } else {
+                nextxOne++;
+                nextxThree--;
+                nextxFour += 2;
+                nextyOne--;
+                nextyThree++;
+            }
+        } else if(shapeRotation == 2) {                 // position 2 to position 3
+            nextxThree--;
+            nextxFour++;
+            nextyOne--;
+            nextyTwo--;
+
+            if(gridMap[xOne][nextyOne] == 0 &&
+                gridMap[nextxTwo][yTwo] == 0 &&
+                gridMap[nextxFour][yFour] == 0) {
+                xThree--;
+                xFour++;
+                yOne--;
+                yTwo--;
+                shapeRotation++;
+            } else {
+                nextxThree++;
+                nextxFour--;
+                nextyOne++;
+                nextyTwo++;
+            }
+        } else if(shapeRotation == 3) {                 // position 3 to position 0
+            nextxOne += 2;
+            nextxTwo--;
+            nextxFour++;
+            nextyTwo++;
+            nextyFour--;
+
+            if(gridMap[nextxOne][yOne] == 0 &&
+                gridMap[nextxTwo][nextyTwo] == 0 &&
+                gridMap[xFour][nextyFour] == 0) {
+                xOne += 2;
+                xTwo--;
+                xFour++;
+                yTwo++;
+                yFour--;
+                shapeRotation = 0;
+            } else {
+                nextxOne -= 2;
+                nextxTwo++;
+                nextxFour--;
+                nextyTwo++;
+                nextyFour++;
+            }
+        }
     }
 
         insertNum(gridShape);                           // sets shape to original spot if not able to be rotated
@@ -987,17 +1832,17 @@ void Grid::rotate(int gridShape, WINDOW *field, WINDOW *nextShapes, WINDOW *scor
 }
 
 void Grid::clearRow()                                   // clears row if it's full
-{                   // probs should add a shift row
+{
     int rowFull = 0;                                    // counter that adds by one and if it
-        for(int i = 1; i < FIELDSIZEY - 1; i++) {       // equals row size, it means row is full
-            for(int j = 1; j < FIELDSIZEX - 1; j++) {
+        for(int i = 1; i < FIELDSIZE - 1; i++) {       // equals row size, it means row is full
+            for(int j = 1; j < FIELDSIZE - 1; j++) {
                 if(gridMap[j][i] == 1) {
                 rowFull++;
                 }
             }
-            if(rowFull == FIELDSIZEX - 2) {             // checks to see if row is full
+            if(rowFull == FIELDSIZE - 2) {             // checks to see if row is full
                     whichRow = i;
-                    for(int z = 1; z < FIELDSIZEX - 1; z++) {
+                    for(int z = 1; z < FIELDSIZE - 1; z++) {
                         gridMap[z][i] = 0;
                     }
                     shiftRow();
@@ -1013,7 +1858,7 @@ void Grid::shiftRow()
 {
 
     for(int i = whichRow; i >= 0; i--) {
-        for(int j = 0; j < FIELDSIZEX - 1; j++) {
+        for(int j = 0; j < FIELDSIZE - 1; j++) {
             gridMap[j][i] = gridMap[j][i - 1];
         }
     }
@@ -1023,7 +1868,7 @@ void Grid::draw_borders(WINDOW *screen) {               // draws borders for eac
     int x, y, i;
 
   getmaxyx(screen, y, x);
-  wattron(screen, COLOR_PAIR(10));                       //starts the borders printing yellow
+  wattron(screen, COLOR_PAIR(10));                      //starts the borders printing yellow
   mvwprintw(screen, 0, 0, "+");                         // makes the 4 corners of the map
   mvwprintw(screen, y - 1, 0, "+");
   mvwprintw(screen, 0, x - 1, "+");
@@ -1039,29 +1884,29 @@ void Grid::draw_borders(WINDOW *screen) {               // draws borders for eac
     mvwprintw(screen, 0, i, "-");
     mvwprintw(screen, y - 1, i, "-");
   }
-  wattroff(screen, COLOR_PAIR(10));                      //ends the borders printing yellow
+  wattroff(screen, COLOR_PAIR(10));                     //ends the borders printing yellow
 
 }
 
 void Grid::printField(WINDOW *field)                    // prints full field window
 {
     wclear(field);
-	for (int i = 1; i < FIELDSIZEY - 1; i++) {
-		for (int j = 1; j < FIELDSIZEX - 1; j++) {
+	for (int i = 1; i < FIELDSIZE - 1; i++) {
+		for (int j = 1; j < FIELDSIZE - 1; j++) {
 			draw_borders(field);
 
 			if (gridMap[i][j] == 0)
 			{
-			    wattron(field, COLOR_PAIR(11));                          //prints the 0s in black
+			    wattron(field, COLOR_PAIR(11));                     //prints the 0s in black
 				mvwprintw(field, j, i, "%d", getCoord(i, j));
             } else {
-				wattron(field, COLOR_PAIR(gridMap[i][j]));              //gets color from insertShape function
+				wattron(field, COLOR_PAIR(gridMap[i][j]));          //gets color from insertShape function
 				mvwprintw(field, j, i, "%d", getCoord(i, j));
 			}
 		}
 	}
 
-    touchwin(field);                                //this is just to makes sure that changes are made to the field window.
+    touchwin(field);                                    //this is just to makes sure that changes are made to the field window.
 	wrefresh(field);
 }
 
@@ -1137,9 +1982,9 @@ void Grid::runGame(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
     draw_borders(field);
 
     printField(field);
-    sleep(1);
+    //sleep(1);
 
-    move(field, nextShapes, score);   // takes care of moving shape
+    move(field, nextShapes, score);                     // takes care of moving shape
 
     printField(field);
 
@@ -1148,14 +1993,15 @@ void Grid::runGame(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
     printField(field);
     wrefresh(field);
 
-    sleep(1);
+    // sleep(1);
+    // usleep(30000);
 
 
 }
 
 void Grid::fillRow()                                    // for testing purposes
 {
-    for(int j = 1; j < FIELDSIZEX - 1; j++) {
+    for(int j = 1; j < FIELDSIZE - 1; j++) {
         gridMap[j][8] = 1;
         gridMap[j][4] = 1;
     }
@@ -1207,3 +2053,54 @@ void Grid::insertNum(int gridShape) {
             break;
     }
 }
+
+void Grid::incrementNextX() {
+    nextxOne = xOne + 1;
+    nextxTwo = xTwo + 1;
+    nextxThree = xThree + 1;
+    nextxFour = xFour + 1;
+}
+
+void Grid::incrementNextY() {
+    nextyOne = yOne + 1;
+    nextyTwo = yTwo + 1;
+    nextyThree = yThree + 1;
+    nextyFour = yFour + 1;
+}
+
+void Grid::decrementNextX() {
+    nextxOne = xOne - 1;
+    nextxTwo = xTwo - 1;
+    nextxThree = xThree - 1;
+    nextxFour = xFour - 1;
+}
+
+void Grid::incrementX() {
+    xOne++;
+    xTwo++;
+    xThree++;
+    xFour++;
+}
+
+void Grid::incrementY() {
+    yOne++;
+    yTwo++;
+    yThree++;
+    yFour++;
+}
+
+void Grid::decrementX() {
+    xOne--;
+    xTwo--;
+    xThree--;
+    xFour--;
+}
+
+void Grid::makeZero() {
+    gridMap[xOne][yOne] = 0;
+    gridMap[xTwo][yTwo] = 0;
+    gridMap[xThree][yThree] = 0;
+    gridMap[xFour][yFour] = 0;
+}
+
+ 

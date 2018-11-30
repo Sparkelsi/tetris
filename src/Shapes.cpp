@@ -21,12 +21,12 @@ Shapes::Shapes(int shapeID)
     :shapeID(shapeID)
     {
         makeShape(shapeID);
-        //makeShape(2);
+        //makeShape(3);
     }
 
 int Shapes::getShapeID() {
     return shapeID;
-    //return 2;
+    //return 3;
 }
 
 int Shapes::getShape(int x, int y) { //this needs to change with size of grid
@@ -36,7 +36,8 @@ int Shapes::getShape(int x, int y) { //this needs to change with size of grid
         throw std::out_of_range("you're going out of bounds somewhere");
 }
 
-/*  1 = cube
+/*
+*   1 = cube
 *   2 = line
 *   3 = T shape
 *   4 = S shape

@@ -16,8 +16,8 @@ Header file for Grid Class in Tetris Inspired Game
 #include <unistd.h>
 #include <list>
 
-#define FIELDSIZEX 24   // defined macros bc it was easier when changing size of field
-#define FIELDSIZEY 24
+#define FIELDSIZE 24   // defined macros bc it was easier when changing size of field
+//#define FIELDSIZE 24
 
 // tbh ya might wanna keep it as a square, the size of the field
 // if we do that, we don't need 2 macros anymore
@@ -49,9 +49,16 @@ public:
     void runGame(WINDOW *field, WINDOW *nextShapes, WINDOW *score);
     void fillRow(); // only used for testing
     void insertNum(int gridShape);
+    void incrementNextX();
+    void incrementNextY();
+    void decrementNextX();
+    void incrementX();
+    void incrementY();
+    void decrementX();
+    void makeZero();
 
 private:
-    int gridMap[FIELDSIZEX][FIELDSIZEY]; //original is 10/24
+    int gridMap[FIELDSIZE][FIELDSIZE]; //original is 10/24
     std::list<Shapes> shapelist;
 
     static int _score;
