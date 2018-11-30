@@ -29,11 +29,11 @@ public:
 
     void createList();
     Shapes getRandomShape();
-    void insertShape(Shapes x, WINDOW *field, WINDOW *nextShapes, WINDOW *score);
-    void pullShape(WINDOW *field, WINDOW *nextShapes, WINDOW *score);
+    void insertShape(Shapes x, WINDOW *field, WINDOW *nextShapes, WINDOW *score, WINDOW *instructions);
+    void pullShape(WINDOW *field, WINDOW *nextShapes, WINDOW *score, WINDOW *instructions);
     int getCoord(int y, int x);
     void resetGrid(); //testing purposes
-    void move(WINDOW *field, WINDOW *nextShapes, WINDOW *score);
+    void colorParams(WINDOW *field, WINDOW *nextShapes, WINDOW *score, WINDOW *instructions, WINDOW *menu);    void move(WINDOW *field, WINDOW *nextShapes, WINDOW *score);
     void moveRight(WINDOW *field, WINDOW *nextShapes, WINDOW *score);
     void moveLeft(WINDOW *field, WINDOW *nextShapes, WINDOW *score);
     void moveDown();
@@ -42,11 +42,13 @@ public:
     void clearRow();
     void shiftRow();
     void draw_borders(WINDOW *screen);
+    void printMenu(WINDOW *menu);
     void printField(WINDOW *field);
     void printNextShapes(WINDOW* nextShapes);
     void printScore(WINDOW *score);
-    void gameOverDisp(WINDOW *field, WINDOW *nextShapes, WINDOW *score);
-    void runGame(WINDOW *field, WINDOW *nextShapes, WINDOW *score);
+    void printInstructions(WINDOW *instructions);
+    void gameOverDisp(WINDOW *field, WINDOW *nextShapes, WINDOW *score, WINDOW *instructions);
+    void runGame(WINDOW *field, WINDOW *nextShapes, WINDOW *score, WINDOW *instructions);
     void fillRow(); // only used for testing
     void insertNum(int gridShape);
     void incrementNextX();

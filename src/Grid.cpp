@@ -11,6 +11,8 @@ Karen Nason
 #include <random>
 
 int Grid::_score = 0;               //static int to keep track of the score.
+
+//NOTE:
 // when changing field size, must change window, insert shape, and move
 // specifically the j's in insert shape and move
 
@@ -41,7 +43,7 @@ Shapes Grid::getRandomShape()
     return tmp;
 }
 
-void Grid::insertShape(Shapes z, WINDOW *field, WINDOW *nextShapes, WINDOW *score) // will always be inserted at same insertion point
+void Grid::insertShape(Shapes z, WINDOW *field, WINDOW *nextShapes, WINDOW *score, WINDOW *instructions) // will always be inserted at same insertion point
 {
 
     int x;
@@ -50,22 +52,22 @@ void Grid::insertShape(Shapes z, WINDOW *field, WINDOW *nextShapes, WINDOW *scor
             for(int j = 10; j < 14; j++) {
                 x = i - 1;                              // place holders so i and j aren't affected
                 y = j - 10;
-                if(gridMap[j][i] == 1) {
-                    gameOverDisp(field, nextShapes, score);     //displays game over window if top pieces hit top of grid
-                } else {
-                    gridMap[j][i] = z.getShape(y, x);           // copies the shape into the grid
+                if(gridMap[j][i] == 0) {
+                    gridMap[j][i] = z.getShape(y, x);            // copies the shape into the grid
+                }else {
+                    gameOverDisp(field, nextShapes, score, instructions);     //displays game over window if top pieces hit top of grid
                 }
             }
         }
 }
 
-void Grid::pullShape(WINDOW *field, WINDOW *nextShapes, WINDOW *score)     // make sure to take score out, just testing things
+void Grid::pullShape(WINDOW *field, WINDOW *nextShapes, WINDOW *score, WINDOW *instructions)     // make sure to take score out, just testing things
 {
     if(shapelist.empty()) {                             // creates list in case one is not already made
         createList();
     }
 
-    insertShape(shapelist.front(), field, nextShapes, score);       // inserts first shape into the grid
+    insertShape(shapelist.front(), field, nextShapes, score, instructions);       // inserts first shape into the grid
     shapelist.pop_front();                                          // deleting first item in the list
     shapelist.push_back(getRandomShape());                          // adding another random shape to back of list
 }
@@ -84,6 +86,26 @@ void Grid::resetGrid()                                  // testing purposes only
         }
     }
 }
+
+void Grid::colorParams(WINDOW *field, WINDOW *nextShapes, WINDOW *score, WINDOW *instructions, WINDOW *menu)
+{
+    init_pair(1, COLOR_CYAN, COLOR_CYAN);       //shapeID 1
+	init_pair(2, COLOR_YELLOW, COLOR_YELLOW);   //shapeID 2
+	init_pair(3, COLOR_RED, COLOR_RED);         //shapeID 3
+	init_pair(4, COLOR_GREEN, COLOR_GREEN);     //shapeID 4
+	init_pair(5, COLOR_WHITE, COLOR_WHITE);     //shapeID 5
+	init_pair(6, COLOR_MAGENTA, COLOR_MAGENTA); //shapeID 6
+	init_pair(7, COLOR_BLUE, COLOR_BLUE);       //shapeID 7
+
+
+
+	init_pair(10, COLOR_YELLOW, COLOR_BLACK);   //border color
+	init_pair(9, COLOR_WHITE, COLOR_BLACK);     //Next Shape and Score text color
+	init_pair(12, COLOR_MAGENTA, COLOR_BLACK);	//design color for instruction window
+	init_pair(13, COLOR_CYAN, COLOR_BLACK);     //design color for menu, a little splash of color
+	init_pair(11, COLOR_BLACK, COLOR_BLACK);    //0's black on black in grid and next shape window
+}
+
 
 
 void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
@@ -159,8 +181,11 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
             printField(field);                          // reprints everything out appearing to move down one space
             printNextShapes(nextShapes);
             printScore(score);
+            wrefresh(field);
+            wrefresh(nextShapes);
+            wrefresh(score);
             // sleep(1);
-            // usleep(300000);
+            usleep(150000);
         }
     } else if(xOne == xTwo || xOne == xFour || xOne == xThree) {    // Mirrored L, L, T, S Shape check
 
@@ -258,8 +283,11 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
                             printField(field);                      // reprints everything out appearing to move down one space
                             printNextShapes(nextShapes);
                             printScore(score);
+                            wrefresh(field);
+                            wrefresh(nextShapes);
+                            wrefresh(score);
                             // sleep(1);
-                            // usleep(300000);
+                            usleep(150000);
                         }
 
                     }
@@ -290,8 +318,11 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
                 printField(field);                      // reprints everything out appearing to move down one space
                 printNextShapes(nextShapes);
                 printScore(score);
+                wrefresh(field);
+                wrefresh(nextShapes);
+                wrefresh(score);
                 // sleep(1);
-                // usleep(300000);
+                usleep(150000);
             }
 
         }
@@ -357,8 +388,11 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
                         printField(field);                      // reprints everything out appearing to move down one space
                         printNextShapes(nextShapes);
                         printScore(score);
+                        wrefresh(field);
+                        wrefresh(nextShapes);
+                        wrefresh(score);
                         // sleep(1);
-                        // usleep(300000);
+                        usleep(150000);
                     }
 
                 }
@@ -382,8 +416,11 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
                 printField(field);                          // reprints everything out appearing to move down one space
                 printNextShapes(nextShapes);
                 printScore(score);
+                wrefresh(field);
+                wrefresh(nextShapes);
+                wrefresh(score);
                 // sleep(1);
-                // usleep(300000);
+                usleep(150000);
             }
 
         }
@@ -451,8 +488,11 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
                             printField(field);                      // reprints everything out appearing to move down one space
                             printNextShapes(nextShapes);
                             printScore(score);
+                            wrefresh(field);
+                            wrefresh(nextShapes);
+                            wrefresh(score);
                             // sleep(1);
-                            // usleep(300000);
+                            usleep(150000);
                         }
                     }
                 }
@@ -477,8 +517,11 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
                 printField(field);                      // reprints everything out appearing to move down one space
                 printNextShapes(nextShapes);
                 printScore(score);
+                wrefresh(field);
+                wrefresh(nextShapes);
+                wrefresh(score);
                 // sleep(1);
-                // usleep(300000);
+                usleep(150000);
                 }
 
         }
@@ -489,6 +532,9 @@ void Grid::move(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
     printField(field);                                  // reprints everything out once the shape can no longer move down
     printNextShapes(nextShapes);
     printScore(score);
+    wrefresh(field);
+    wrefresh(nextShapes);
+    wrefresh(score);
 }
 
 
@@ -511,8 +557,11 @@ void Grid::moveRight(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
     printField(field);                                  // reprints everything out appearing to move right one space
     printNextShapes(nextShapes);
     printScore(score);
+    wrefresh(field);
+            wrefresh(nextShapes);
+            wrefresh(score);
     // sleep(1);
-    // usleep(300000);
+    usleep(150000);
 
     } else if(yTwo == yThree && yThree == yFour &&      // Mirrored L, L, T shape check
         gridMap[nextxOne][yOne] == 0 &&
@@ -531,8 +580,11 @@ void Grid::moveRight(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                              // reprints everything out appearing to move right one space
         printNextShapes(nextShapes);
         printScore(score);
+        wrefresh(field);
+            wrefresh(nextShapes);
+            wrefresh(score);
         // sleep(1);
-        // usleep(300000);
+        usleep(150000);
 
     } else if(yOne == yTwo && yThree == yFour &&        // Cube, S, Z shape check
         gridMap[nextxTwo][yTwo] == 0 &&
@@ -551,8 +603,11 @@ void Grid::moveRight(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                              // reprints everything out appearing to move right one space
         printNextShapes(nextShapes);
         printScore(score);
+        wrefresh(field);
+            wrefresh(nextShapes);
+            wrefresh(score);
         // sleep(1);
-        // usleep(300000);
+        usleep(150000);
 
     } else if(xOne == xTwo && xTwo == xThree && xThree == xFour &&      // rotation 1 and 2 line check
         gridMap[nextxOne][yOne] == 0 &&
@@ -569,8 +624,11 @@ void Grid::moveRight(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                              // reprints everything out appearing to move right one space
         printNextShapes(nextShapes);
         printScore(score);
+        wrefresh(field);
+            wrefresh(nextShapes);
+            wrefresh(score);
         // sleep(1);
-        // usleep(300000);
+        usleep(150000);
 
     } else if(xOne == xTwo && xTwo == xFour &&                          // rotation 1 T check
         gridMap[nextxOne][xOne] == 0 &&
@@ -589,8 +647,11 @@ void Grid::moveRight(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                              // reprints everything out appearing to move right one space
         printNextShapes(nextShapes);
         printScore(score);
+        wrefresh(field);
+            wrefresh(nextShapes);
+            wrefresh(score);
         //sleep(1);
-        // usleep(300000);
+        usleep(150000);
 
     } else if(yOne == yTwo && yTwo == yThree &&                         // rotation 2 T check
         gridMap[nextxThree][yThree] == 0 &&
@@ -608,7 +669,7 @@ void Grid::moveRight(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printNextShapes(nextShapes);
         printScore(score);
         //sleep(1);
-        // usleep(300000);
+        usleep(150000);
     } else if(xOne == xThree && xThree == xFour &&                          // rotation 3 T check
         gridMap[nextxOne][xOne] == 0 &&
         gridMap[nextxThree][yThree] == 0 &&
@@ -628,8 +689,11 @@ void Grid::moveRight(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                              // reprints everything out appearing to move right one space
         printNextShapes(nextShapes);
         printScore(score);
+        wrefresh(field);
+            wrefresh(nextShapes);
+            wrefresh(score);
         //sleep(1);
-        // usleep(300000);
+        usleep(150000);
 
     } else if(xOne == xTwo && xThree == xFour &&       // rotation 1 and 3 S check                   // rotation 3 T check
         gridMap[nextxOne][xOne] == 0 &&
@@ -649,8 +713,11 @@ void Grid::moveRight(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                              // reprints everything out appearing to move right one space
         printNextShapes(nextShapes);
         printScore(score);
+        wrefresh(field);
+            wrefresh(nextShapes);
+            wrefresh(score);
         //sleep(1);
-        // usleep(300000);
+        usleep(150000);
 
     } else if(xOne == xThree && xTwo == xFour &&       // rotation 1 and 3 Z check
         gridMap[nextxOne][xOne] == 0 &&
@@ -669,8 +736,11 @@ void Grid::moveRight(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                              // reprints everything out appearing to move right one space
         printNextShapes(nextShapes);
         printScore(score);
+        wrefresh(field);
+            wrefresh(nextShapes);
+            wrefresh(score);
         //sleep(1);
-        // usleep(300000);
+        usleep(150000);
 
     } else if(xOne == xTwo && xTwo == xFour &&          // rotation 3 L check
         gridMap[nextxOne][xOne] == 0 &&
@@ -691,8 +761,11 @@ void Grid::moveRight(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                              // reprints everything out appearing to move right one space
         printNextShapes(nextShapes);
         printScore(score);
+        wrefresh(field);
+            wrefresh(nextShapes);
+            wrefresh(score);
         //sleep(1);
-        // usleep(300000);
+        usleep(150000);
 
     } else if(xOne == xTwo && xTwo == xThree &&          // rotation 3 L check
         gridMap[nextxOne][xOne] == 0 &&
@@ -713,8 +786,11 @@ void Grid::moveRight(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                              // reprints everything out appearing to move right one space
         printNextShapes(nextShapes);
         printScore(score);
+        wrefresh(field);
+            wrefresh(nextShapes);
+            wrefresh(score);
         //sleep(1);
-        // usleep(300000);
+        usleep(150000);
 
     }
 
@@ -743,8 +819,11 @@ void Grid::moveLeft(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                              // reprints everything out appearing to move left one space
         printNextShapes(nextShapes);
         printScore(score);
+        wrefresh(field);
+            wrefresh(nextShapes);
+            wrefresh(score);
         //sleep(1);
-        // usleep(300000);
+        usleep(150000);
 
     } else if(yTwo == yThree && yThree == yFour &&      // Mirrored L, L, T shape check
         gridMap[nextxOne][yOne] == 0 &&
@@ -763,8 +842,11 @@ void Grid::moveLeft(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                              // reprints everything out appearing to move left one space
         printNextShapes(nextShapes);
         printScore(score);
+        wrefresh(field);
+            wrefresh(nextShapes);
+            wrefresh(score);
         //sleep(1);
-        // usleep(300000);
+        usleep(150000);
 
     } else if(yOne == yTwo && yThree == yFour &&        // Cube, S, Z shape check
         gridMap[nextxOne][yOne] == 0 &&
@@ -783,8 +865,11 @@ void Grid::moveLeft(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                              // reprints everything out appearing to move left one space
         printNextShapes(nextShapes);
         printScore(score);
+        wrefresh(field);
+            wrefresh(nextShapes);
+            wrefresh(score);
         //sleep(1);
-        // usleep(300000);
+        usleep(150000);
     } else if(xOne == xTwo && xTwo == xThree && xThree == xFour &&      // rotation 1 and 2 line check
             gridMap[nextxOne][yOne] == 0 &&
             nextxOne != 0) {
@@ -800,8 +885,11 @@ void Grid::moveLeft(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
             printField(field);                          // reprints everything out appearing to move left one space
             printNextShapes(nextShapes);
             printScore(score);
+            wrefresh(field);
+            wrefresh(nextShapes);
+            wrefresh(score);
             //sleep(1);
-            // usleep(300000);
+            usleep(150000);
 
     } else if(yOne == yTwo && yTwo == yThree &&
         gridMap[nextxOne][yOne] == 0 &&
@@ -819,8 +907,11 @@ void Grid::moveLeft(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                          // reprints everything out appearing to move left one space
         printNextShapes(nextShapes);
         printScore(score);
+        wrefresh(field);
+            wrefresh(nextShapes);
+            wrefresh(score);
         //sleep(1);
-        // usleep(300000);
+        usleep(150000);
 
     } else if(xOne == xThree && xThree == xFour &&                          // rotation 3 T check
         gridMap[nextxOne][xOne] == 0 &&
@@ -839,8 +930,11 @@ void Grid::moveLeft(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                          // reprints everything out appearing to move left one space
         printNextShapes(nextShapes);
         printScore(score);
+        wrefresh(field);
+            wrefresh(nextShapes);
+            wrefresh(score);
         //sleep(1);
-        // usleep(300000);
+        usleep(150000);
 
     } else if(xOne == xTwo && xTwo == xFour &&                          // rotation 3 T check
         gridMap[nextxOne][xOne] == 0 &&
@@ -859,8 +953,11 @@ void Grid::moveLeft(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                          // reprints everything out appearing to move left one space
         printNextShapes(nextShapes);
         printScore(score);
+        wrefresh(field);
+            wrefresh(nextShapes);
+            wrefresh(score);
         //sleep(1);
-        // usleep(300000);
+        usleep(150000);
 
     } else if(xOne == xTwo && xThree == xFour &&                          // rotation 3 T check
         gridMap[nextxOne][xOne] == 0 &&
@@ -880,8 +977,11 @@ void Grid::moveLeft(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                          // reprints everything out appearing to move left one space
         printNextShapes(nextShapes);
         printScore(score);
+        wrefresh(field);
+            wrefresh(nextShapes);
+            wrefresh(score);
         //sleep(1);
-        // usleep(300000);
+        usleep(150000);
 
     } else if(xOne == xThree && xTwo == xFour &&                        // rotation 1 and 3 Z check
         gridMap[nextxOne][xOne] == 0 &&
@@ -900,8 +1000,11 @@ void Grid::moveLeft(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                          // reprints everything out appearing to move left one space
         printNextShapes(nextShapes);
         printScore(score);
+        wrefresh(field);
+            wrefresh(nextShapes);
+            wrefresh(score);
         //sleep(1);
-        // usleep(300000);
+        usleep(150000);
 
     } else if(xOne == xTwo && xTwo == xFour &&          // rotation 3 L check
         gridMap[nextxOne][xOne] == 0 &&
@@ -922,8 +1025,11 @@ void Grid::moveLeft(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                          // reprints everything out appearing to move left one space
         printNextShapes(nextShapes);
         printScore(score);
+        wrefresh(field);
+            wrefresh(nextShapes);
+            wrefresh(score);
         //sleep(1);
-        // usleep(300000);
+        usleep(150000);
 
     } else if(xOne == xTwo && xTwo == xThree &&          // rotation 3 L check
         gridMap[nextxOne][xOne] == 0 &&
@@ -944,8 +1050,11 @@ void Grid::moveLeft(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
         printField(field);                          // reprints everything out appearing to move left one space
         printNextShapes(nextShapes);
         printScore(score);
+        wrefresh(field);
+            wrefresh(nextShapes);
+            wrefresh(score);
         //sleep(1);
-        // usleep(300000);
+        usleep(150000);
 
     }
 
@@ -1836,7 +1945,7 @@ void Grid::clearRow()                                   // clears row if it's fu
     int rowFull = 0;                                    // counter that adds by one and if it
         for(int i = 1; i < FIELDSIZE - 1; i++) {       // equals row size, it means row is full
             for(int j = 1; j < FIELDSIZE - 1; j++) {
-                if(gridMap[j][i] == 1) {
+                if(gridMap[j][i] != 0) {                //as long as it doesn't equal 0, increment
                 rowFull++;
                 }
             }
@@ -1846,7 +1955,7 @@ void Grid::clearRow()                                   // clears row if it's fu
                         gridMap[z][i] = 0;
                     }
                     shiftRow();
-                    _score++;
+                    _score += 20;
             }                                           // resets counter back to zero after checking a row
              rowFull = 0;
         }
@@ -1888,9 +1997,35 @@ void Grid::draw_borders(WINDOW *screen) {               // draws borders for eac
 
 }
 
+void Grid::printMenu(WINDOW *menu)
+{
+    char ch;
+
+   
+    keypad(menu, true);
+    do{
+        draw_borders(menu);
+        wattron(menu, A_BOLD);
+        mvwprintw(menu, 4, 3, "KELTRIS: A TETRIS INSPIRED GAME");
+        mvwprintw(menu, 5, 3, "Press  'k'  to begin.");
+        wattroff(menu, A_BOLD);
+
+        wattron(menu, COLOR_PAIR(13));
+        mvwprintw(menu, 2, 2, "/ / / / / / / / / / / / / / / / / / / / / / / / /");
+        mvwprintw(menu, 7, 2, "/ / / / / / / / / / / / / / / / / / / / / / / / /");
+
+
+        touchwin(menu);
+        wrefresh(menu);
+        sleep(1);
+    }while ((ch = getch()) != 'k');
+    
+}
+
 void Grid::printField(WINDOW *field)                    // prints full field window
 {
     wclear(field);
+    //wattron(field, A_BOLD);                                //brightens the shapes so you can see the grid better for testing.
 	for (int i = 1; i < FIELDSIZE - 1; i++) {
 		for (int j = 1; j < FIELDSIZE - 1; j++) {
 			draw_borders(field);
@@ -1936,67 +2071,114 @@ void Grid::printScore(WINDOW *score)                    // prints full score win
 {
     wclear(score);
     draw_borders(score);
+    wattron(score, A_BOLD);
     mvwprintw(score,1, 1, "Score: ");
     mvwprintw(score, 1, 8, "%d", _score);
+    wattroff(score, A_BOLD);
     wrefresh(score);
 }
 
-void Grid::gameOverDisp(WINDOW *field, WINDOW *nextShapes, WINDOW *score)   // creates/prints full gameOverDisp window
+void Grid::printInstructions(WINDOW *instructions)
+{
+    wclear(instructions);
+    draw_borders(instructions);
+    wattron(instructions, A_BOLD);
+    wattron(instructions, COLOR_PAIR(12));
+    mvwprintw(instructions, 1, 3, " < < < < < < < < < ");
+    wattroff(instructions, COLOR_PAIR(12));
+    mvwprintw(instructions, 2, 3, " ");
+    mvwprintw(instructions, 3, 3, "Keys to Play:");
+    mvwprintw(instructions, 4, 3, " ");
+    mvwprintw(instructions, 5, 3, "'a' - Left");
+    mvwprintw(instructions, 6, 3, " ");
+    mvwprintw(instructions, 7, 3, "'d' - Right");
+    mvwprintw(instructions, 8, 1, " ");
+    mvwprintw(instructions, 9, 3, "'s' - Down");
+    mvwprintw(instructions, 10, 1, " ");
+    mvwprintw(instructions, 11, 3, "'r' - Rotate");
+    mvwprintw(instructions, 12, 1, " ");
+    mvwprintw(instructions, 13, 3, "Spacebar - All Down");
+    mvwprintw(instructions, 14, 1, " ");
+    wattron(instructions, COLOR_PAIR(12));
+    mvwprintw(instructions, 15, 3, "> > > > > > > > >");
+    wattroff(instructions, COLOR_PAIR(12));
+    wattroff(instructions, A_BOLD);
+    wrefresh(instructions);
+
+    
+}
+
+void Grid::gameOverDisp(WINDOW *field, WINDOW *nextShapes, WINDOW *score, WINDOW *instructions)   // creates/prints full gameOverDisp window
 {
     wclear(field);                                      // still need to find a way to delete windows
     wclear(nextShapes);                                 // probs can throw an exception
     wclear(score);
+    wclear(instructions);
     wrefresh(field);
     wrefresh(nextShapes);
     wrefresh(score);
+    wrefresh(instructions);
 
+    
     WINDOW *gameOver = newwin(24, 48, 0, 0);
     while(1)
     {
     draw_borders(gameOver);
-    mvwprintw(gameOver, 1, 1, "G A M E  O V E R");
-    mvwprintw(gameOver, 2, 1, "Please click 'ctrl+c' to exit");
+    mvwprintw(gameOver, 4, 8, "G A M E  O V E R");
+    mvwprintw(gameOver, 6, 8, "Please click 'ctrl+c' to exit");
+    mvwprintw(gameOver, 10, 14, "SCORE: ");
+    mvwprintw(gameOver, 10, 21, "%d", _score);
+    wattron(gameOver, COLOR_PAIR(13));
+    mvwprintw(gameOver, 8, 12, "* * * * * * * * *");
+    mvwprintw(gameOver, 12, 12, "* * * * * * * * *");
+    wattroff(gameOver, COLOR_PAIR(13));
     wrefresh(gameOver);
     sleep(10);
     }
-
+    
 }
 
-void Grid::runGame(WINDOW *field, WINDOW *nextShapes, WINDOW *score)
+void Grid::runGame(WINDOW *field, WINDOW *nextShapes, WINDOW *score, WINDOW *instructions)
 {
 
-    printField(field);
+        printField(field);
 
-    printNextShapes(nextShapes);
+        printNextShapes(nextShapes);
 
-    printScore(score);
+        printScore(score);
 
-
-    pullShape(field, nextShapes, score);
-
-    wclear(field);
-    wclear(nextShapes);
-    wclear(score);
-
-    draw_borders(nextShapes);
-    draw_borders(field);
-
-    printField(field);
-    //sleep(1);
-
-    move(field, nextShapes, score);                     // takes care of moving shape
-
-    printField(field);
-
-    clearRow();
-    wrefresh(field);
-    printField(field);
-    wrefresh(field);
-
-    // sleep(1);
-    // usleep(30000);
+        printInstructions(instructions);
 
 
+        pullShape(field, nextShapes, score, instructions);
+
+        wclear(field);
+        wclear(nextShapes);
+        wclear(score);
+
+        draw_borders(nextShapes);
+        draw_borders(field);
+
+        printField(field);
+        sleep(1);
+
+        move(field, nextShapes, score);   // takes care of moving shape
+
+        printField(field);
+        
+        
+        /*fillRow();                    testing score and collision detection
+        printField(field);
+        wrefresh(field);*/
+        
+        clearRow();                       
+        wrefresh(field);
+        printField(field);
+        wrefresh(field);
+
+        sleep(1);
+        
+        
 }
 
 void Grid::fillRow()                                    // for testing purposes
@@ -2103,4 +2285,4 @@ void Grid::makeZero() {
     gridMap[xFour][yFour] = 0;
 }
 
- 
+
