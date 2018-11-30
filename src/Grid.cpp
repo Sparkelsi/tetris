@@ -2001,12 +2001,12 @@ void Grid::printMenu(WINDOW *menu)
 {
     char ch;
 
-   
+
     keypad(menu, true);
     do{
         draw_borders(menu);
         wattron(menu, A_BOLD);
-        mvwprintw(menu, 4, 3, "KELTRIS: A TETRIS INSPIRED GAME");
+        mvwprintw(menu, 4, 3, "K-TRIS: A TETRIS INSPIRED GAME");
         mvwprintw(menu, 5, 3, "Press  'k'  to begin.");
         wattroff(menu, A_BOLD);
 
@@ -2019,7 +2019,7 @@ void Grid::printMenu(WINDOW *menu)
         wrefresh(menu);
         sleep(1);
     }while ((ch = getch()) != 'k');
-    
+
 }
 
 void Grid::printField(WINDOW *field)                    // prints full field window
@@ -2105,7 +2105,7 @@ void Grid::printInstructions(WINDOW *instructions)
     wattroff(instructions, A_BOLD);
     wrefresh(instructions);
 
-    
+
 }
 
 void Grid::gameOverDisp(WINDOW *field, WINDOW *nextShapes, WINDOW *score, WINDOW *instructions)   // creates/prints full gameOverDisp window
@@ -2119,7 +2119,7 @@ void Grid::gameOverDisp(WINDOW *field, WINDOW *nextShapes, WINDOW *score, WINDOW
     wrefresh(score);
     wrefresh(instructions);
 
-    
+
     WINDOW *gameOver = newwin(24, 48, 0, 0);
     while(1)
     {
@@ -2135,7 +2135,7 @@ void Grid::gameOverDisp(WINDOW *field, WINDOW *nextShapes, WINDOW *score, WINDOW
     wrefresh(gameOver);
     sleep(10);
     }
-    
+
 }
 
 void Grid::runGame(WINDOW *field, WINDOW *nextShapes, WINDOW *score, WINDOW *instructions)
@@ -2165,20 +2165,20 @@ void Grid::runGame(WINDOW *field, WINDOW *nextShapes, WINDOW *score, WINDOW *ins
         move(field, nextShapes, score);   // takes care of moving shape
 
         printField(field);
-        
-        
+
+
         /*fillRow();                    testing score and collision detection
         printField(field);
         wrefresh(field);*/
-        
-        clearRow();                       
+
+        clearRow();
         wrefresh(field);
         printField(field);
         wrefresh(field);
 
         sleep(1);
-        
-        
+
+
 }
 
 void Grid::fillRow()                                    // for testing purposes
@@ -2284,5 +2284,3 @@ void Grid::makeZero() {
     gridMap[xThree][yThree] = 0;
     gridMap[xFour][yFour] = 0;
 }
-
-
